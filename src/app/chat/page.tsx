@@ -103,7 +103,7 @@ function greet(name) {
       
       <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden">
         {/* Chat Messages - Full Height */}
-        <div id="main-message" className="flex-1 overflow-y-auto pt-20 p-6 pb-32">
+        <div id="main-message" className="flex-1 overflow-y-auto pt-20 p-6 pb-32 scroll-smooth no-scrollbar">
           <div className="max-w-4xl mx-auto space-y-6">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -132,7 +132,7 @@ function greet(name) {
                 ) : (
                   <div className="flex space-x-4 items-start">
                     <div className="flex flex-col items-end">
-                      <div className="bg-blue-500 text-white p-4 rounded-lg max-w-md">
+                      <div className="bg-blue-500 text-white px-4 py-2 rounded-lg max-w-md">
                         <p className="whitespace-pre-wrap">{message.content}</p>
                       </div>
                       <div className="text-xs text-gray-500 mt-1 text-right">

@@ -19,7 +19,11 @@ export default function Sidebar({ user }: SidebarProps) {
   ])
 
   return (
-    <div className={`${isCollapsed ? 'w-16' : 'w-80'} h-screen bg-gray-900 text-white flex flex-col transition-all duration-300 ease-in-out`}>
+    <div
+      className={`${isCollapsed ? 'w-16' : 'w-80'} h-screen bg-gray-900 text-white flex flex-col transition-all duration-300 ease-in-out`}
+      onMouseEnter={() => setIsCollapsed(false)}
+      onMouseLeave={() => setIsCollapsed(true)}
+    >
       {/* Logo Section with Collapse Button */}
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between">
@@ -31,20 +35,7 @@ export default function Sidebar({ user }: SidebarProps) {
             </div>
             {!isCollapsed && <h1 className="text-xl font-semibold">ChatGPT Clone</h1>}
           </div>
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 hover:bg-gray-700 bg-gray-900 rounded transition-colors"
-            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <svg
-              className={`w-5 h-5 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+
         </div>
       </div>
 
@@ -109,6 +100,20 @@ export default function Sidebar({ user }: SidebarProps) {
 
       {/* User Profile Section */}
       <div className="p-4 border-t border-gray-700">
+          {/* <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1 hover:bg-gray-700 bg-gray-900 rounded transition-colors overflow-visible"
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <svg
+              className={`w-5 h-5 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button> */}
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
           <div className="flex items-center space-x-3">
             {user.image ? (
