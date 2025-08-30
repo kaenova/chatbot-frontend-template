@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import ChatHeader from '@/components/ChatHeader'
-import MobileSidebar from '@/components/MobileSidebar'
 import UserMessage from '@/components/UserMessage'
 import AssistantMessage from '@/components/AssistantMessage'
 import LoadingMessage from '@/components/LoadingMessage'
@@ -19,8 +17,6 @@ interface Message {
 
 export default function ChatPage() {
   const { data: session } = useSession()
-  const [chatTitle, setChatTitle] = useState('New Chat')
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -88,17 +84,6 @@ function greet(name) {
     }, 1000)
   }
 
-  // Close mobile sidebar on desktop resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsMobileSidebarOpen(false)
-      }
-    }
-    
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   useEffect(() => {
     const messageContainer = document.getElementById('main-message')
@@ -111,17 +96,9 @@ function greet(name) {
   }, [messages])
 
   return (
-    <>
-      {/* Mobile Sidebar */}
-      <MobileSidebar 
-        user={session?.user || { name: 'User', email: 'user@example.com' }}
-        isOpen={isMobileSidebarOpen}
-        onClose={() => setIsMobileSidebarOpen(false)}
-      />
-      
-      <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden">
-        {/* Chat Messages - Full Height */}
-        <div id="main-message" className="flex-1 overflow-y-auto pt-20 p-6 pb-32 scroll-smooth no-scrollbar">
+    <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden">
+      {/* Chat Messages - Full Height */}
+      <div id="main-message" className="flex-1 overflow-y-auto p-6 pb-32 scroll-smooth no-scrollbar md:pt-6 pt-20">
           <div className="max-w-4xl mx-auto space-y-6">
             {messages.length === 0 ? (
               // Welcome placeholder for new chats
@@ -151,14 +128,6 @@ function greet(name) {
           </div>
         </div>
 
-        {/* Floating Chat Header - Overlaid on top */}
-        <div className="absolute top-0 left-0 right-0 z-30 ">
-          <ChatHeader
-            title={chatTitle}
-            onTitleChange={setChatTitle}
-            onMobileMenuToggle={() => setIsMobileSidebarOpen(true)}
-          />
-        </div>
 
         {/* Floating Input */}
         <ChatInput
@@ -168,6 +137,5 @@ function greet(name) {
           isLoading={isLoading}
         />
       </div>
-    </>
   )
 }

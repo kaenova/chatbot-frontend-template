@@ -1,6 +1,6 @@
 import AuthLayout from "@/components/AuthLayout"
 
-export default function ChatLayout({
+export default function ResourceManagementLayout({
   children,
 }: {
   children: React.ReactNode

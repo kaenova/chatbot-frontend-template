@@ -1,6 +1,6 @@
 import AuthLayout from "@/components/AuthLayout"
 
-export default function ChatLayout({
+export default function SettingsLayout({
   children,
 }: {
   children: React.ReactNode

@@ -36,4 +36,30 @@ body {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  /* Custom scrollbar with rounded design and hover brightness */
+  .modern-scrollbar {
+    /* For webkit browsers (Chrome, Safari, Opera) */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #aaa; /* Brighter on hover */
+    }
+
+    /* For Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+  }
 }
