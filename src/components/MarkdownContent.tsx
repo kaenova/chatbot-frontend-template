@@ -63,7 +63,9 @@ export default function MarkdownContent({ content, className = '' }: MarkdownCon
       <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
         {children}
       </td>
-    )
+    ),
+    ul: ({ children }) => <ul className="list-disc ml-4">{children}</ul>,
+    li: ({ children }) => <li className="mb-1">{children}</li>
   }
 
   return (
