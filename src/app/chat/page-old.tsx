@@ -52,6 +52,14 @@ export default function ChatPage() {
         content: `Thank you for your message: "${userMessage.content}". This is a placeholder response. In a real implementation, this would be connected to an AI service like OpenAI's GPT API.
 
 Here are some **markdown features** that are supported:
+
+| Feature | Description | Example |
+|---------|-------------|---------|
+| **Bold** | Makes text bold | \`**text**\` |
+| *Italic* | Makes text italic | \`*text*\` |
+| \`Code\` | Inline code formatting | \`\`code\`\` |
+| Tables | Structured data display | See below |
+| Lists | Bulleted or numbered lists | - Item 1<br>- Item 2 |
 - **Bold text**
 - *Italic text*
 - \`Inline code\`
