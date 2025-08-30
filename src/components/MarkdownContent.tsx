@@ -31,7 +31,39 @@ export default function MarkdownContent({ content, className = '' }: MarkdownCon
         </InlineCode>
       )
     },
-    pre: ({ children }) => <>{children}</>
+    pre: ({ children }) => <>{children}</>,
+    table: ({ children }) => (
+      <div className="overflow-x-auto my-4">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-t-lg overflow-hidden">
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({ children }) => (
+      <thead className="bg-gray-50 dark:bg-gray-800 rounded-t-lg">
+        {children}
+      </thead>
+    ),
+    tbody: ({ children }) => (
+      <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700 rounded-b-lg">
+        {children}
+      </tbody>
+    ),
+    tr: ({ children }) => (
+      <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+        {children}
+      </tr>
+    ),
+    th: ({ children }) => (
+      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+        {children}
+      </th>
+    ),
+    td: ({ children }) => (
+      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+        {children}
+      </td>
+    )
   }
 
   return (

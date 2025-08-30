@@ -2,8 +2,8 @@
 
 import { signOut } from "next-auth/react"
 import { User } from "next-auth"
-import { useState } from "react"
 import Image from "next/image"
+import { useChat } from "@/contexts/ChatContext"
 
 interface MobileSidebarProps {
   user: User
@@ -12,12 +12,7 @@ interface MobileSidebarProps {
 }
 
 export default function MobileSidebar({ user, isOpen, onClose }: MobileSidebarProps) {
-  const [chatHistory] = useState([
-    { id: '1', title: 'How to build a web application', date: '2 hours ago' },
-    { id: '2', title: 'React best practices', date: '1 day ago' },
-    { id: '3', title: 'TypeScript basics', date: '3 days ago' },
-    { id: '4', title: 'Next.js routing', date: '1 week ago' },
-  ])
+  const { chatHistory } = useChat()
 
   if (!isOpen) return null
 
