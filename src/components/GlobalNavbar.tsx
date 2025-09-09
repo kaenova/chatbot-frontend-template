@@ -125,7 +125,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
                 className="w-full border border-gray-300 py-2.5 px-4 rounded-full flex items-center justify-center space-x-2 transition-colors hover:bg-gray-200"
                 style={{ color: 'var(--foreground)' }}
               >
-                <SquarePen className="w-4 h-4" />
+                <SquarePen className={`w-4 h-4 ${ isCollapsed ? "text-gray-400" : "text-gray-400"}`} />
                 <span className="text-gray-500">New Chat</span>
               </button>
             </div>
