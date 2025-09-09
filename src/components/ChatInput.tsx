@@ -9,7 +9,7 @@ interface ChatInputProps {
 
 export default function ChatInput({ input, setInput, handleSubmit, isLoading }: ChatInputProps) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-100 via-gray-100 to-transparent pt-20">
+    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-100 via-gray-100 to-transparent pt-14">
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-6 pb-6">
         <div className="flex space-x-4 items-start">
           <div className="flex-1">
