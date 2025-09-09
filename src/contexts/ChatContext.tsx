@@ -15,6 +15,7 @@ interface ChatContextType {
   setChatHistory: (history: ChatItem[]) => void
   getGroupedChatHistory: () => GroupedChatHistory
   togglePinChat: (chatId: string) => void
+  deleteChat: (chatId: string) => void
 }
 
 interface GroupedChatHistory {
@@ -206,10 +207,22 @@ export function ChatProvider({ children }: ChatProviderProps) {
     )
   }
 
+  const deleteChat = (chatId: string) => {
+    setChatHistory(prevHistory => 
+      prevHistory.filter(chat => chat.id !== chatId)
+    )
+  }
+
   const getGroupedChatHistory = () => groupChatsByDate(chatHistory)
 
   return (
-    <ChatContext.Provider value={{ chatHistory, setChatHistory, getGroupedChatHistory, togglePinChat }}>
+    <ChatContext.Provider value={{ 
+      chatHistory, 
+      setChatHistory, 
+      getGroupedChatHistory, 
+      togglePinChat, 
+      deleteChat
+    }}>
       {children}
     </ChatContext.Provider>
   )

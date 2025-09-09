@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { useChat } from "@/contexts/ChatContext"
+import { useModal } from "@/contexts/ModalContext"
 import MenuButton from "./MenuButton"
 import Logo from "./Logo"
 import ChatSearch from "./ChatSearch"
@@ -22,11 +23,12 @@ interface ChatGroupProps {
   chats: { id: string; title: string; date: string; createdAt: Date; isPinned: boolean }[]
   onChatClick: (chatId: string) => void
   onTogglePin?: (chatId: string) => void
+  onDeleteChat?: (chatId: string) => void
   isCollapsed?: boolean
   isMobile?: boolean
 }
 
-function ChatGroup({ title, chats, onChatClick, onTogglePin, isCollapsed = false, isMobile = false }: ChatGroupProps) {
+function ChatGroup({ title, chats, onChatClick, onTogglePin, onDeleteChat, isCollapsed = false, isMobile = false }: ChatGroupProps) {
   if (chats.length === 0) return null
 
   if (isCollapsed) {
@@ -108,11 +110,18 @@ function ChatGroup({ title, chats, onChatClick, onTogglePin, isCollapsed = false
                     </svg>
                   </button>
                 )}
-                <button className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-gray-700 p-1 transition-all">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                {
+                  onDeleteChat &&
+                  <button 
+                    onClick={(e) => {e.stopPropagation(); onDeleteChat(chat.id)}} 
+                    className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-700 p-1 transition-all"
+                    title="Delete chat"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                }
               </div>
             </div>
           </div>
@@ -126,13 +135,35 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isPinned, setIsPinned] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const { getGroupedChatHistory, togglePinChat } = useChat()
+  const { getGroupedChatHistory, togglePinChat, deleteChat } = useChat()
+  const { showConfirmation } = useModal()
   const router = useRouter()
   const pathname = usePathname()
   const siteConfig = getSiteConfig()
 
   // Get grouped chat history
   const groupedChats = getGroupedChatHistory()
+
+  // Handle delete with confirmation popup
+  const handleDeleteChat = (chatId: string) => {
+    const allChats = [
+      ...groupedChats.pinned,
+      ...groupedChats.today,
+      ...groupedChats.yesterday,
+      ...groupedChats.previous7Days,
+      ...groupedChats.previous30Days,
+      ...groupedChats.older
+    ]
+    const chat = allChats.find(c => c.id === chatId)
+    if (chat) {
+      showConfirmation({
+        chatId,
+        chatTitle: chat.title,
+        message: `Are you sure you want to delete "${chat.title}"? This action cannot be undone.`,
+        onConfirm: () => deleteChat(chatId)
+      })
+    }
+  }
 
   // Get mobile title based on current page - use centralized function
   const getMobileTitle = () => {
@@ -220,7 +251,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
           {/* Mobile Sidebar */}
           <div className="fixed inset-0 w-full text-white flex flex-col z-50 md:hidden transform transition-transform duration-300 ease-in-out translate-x-0 max-h-screen overflow-hidden" style={{ backgroundColor: 'var(--sidebar-bg)' }}>
             {/* Header with Close Button */}
-            <div className="flex-shrink-0 p-4 border-b border-gray-300 flex items-center justify-between">
+            <div className="flex-shrink-0 p-4  flex items-center justify-between">
               <Logo showText={true} />
               <button
                 onClick={() => setIsMobileSidebarOpen(false)}
@@ -252,12 +283,12 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             {/* Chat History - Scrollable */}
             <div className="flex-1 overflow-y-auto min-h-0">
               <div className="px-4">
-                <ChatGroup title="Pinned" chats={groupedChats.pinned} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
-                <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
-                <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
-                <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
-                <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
-                <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
+                <ChatGroup title="Pinned" chats={groupedChats.pinned} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} isMobile={true} />
+                <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} isMobile={true} />
+                <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} isMobile={true} />
+                <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} isMobile={true} />
+                <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} isMobile={true} />
+                <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} isMobile={true} />
               </div>
             </div>
 
@@ -358,12 +389,12 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {/* Chat History - Scrollable */}
         {!isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-4 modern-scrollbar">
-            <ChatGroup title="Pinned" chats={groupedChats.pinned} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
-            <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
-            <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
-            <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
-            <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
-            <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
+            <ChatGroup title="Pinned" chats={groupedChats.pinned} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} />
+            <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} />
+            <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} />
+            <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} />
+            <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} />
+            <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} onTogglePin={togglePinChat} onDeleteChat={handleDeleteChat} />
           </div>
         )}
 

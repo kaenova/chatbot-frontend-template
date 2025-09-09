@@ -3,6 +3,8 @@
 import { SessionProvider } from "next-auth/react"
 import { ReactNode } from "react"
 import { ChatProvider } from "@/contexts/ChatContext"
+import { ModalProvider } from "@/contexts/ModalContext"
+import ConfirmationModal from "./ConfirmationModal"
 
 interface ProvidersProps {
   children: ReactNode
@@ -11,9 +13,12 @@ interface ProvidersProps {
 export default function Providers({ children }: ProvidersProps) {
   return (
     <ChatProvider>
-      <SessionProvider>
-        {children}
-      </SessionProvider>
+      <ModalProvider>
+        <SessionProvider>
+          {children}
+          <ConfirmationModal />
+        </SessionProvider>
+      </ModalProvider>
     </ChatProvider>
   )
 }
