@@ -9,6 +9,7 @@ import { useChat } from "@/contexts/ChatContext"
 import MenuButton from "./MenuButton"
 import Logo from "./Logo"
 import { getSiteConfig } from "@/lib/site-config"
+import { SquarePen } from "lucide-react"
 
 interface GlobalNavbarProps {
   user: User
@@ -120,11 +121,10 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             <div className="flex-shrink-0 p-4">
               <button
                 onClick={handleNewChat}
-                className="w-full bg-gray-300 hover:bg-gray-400 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
-                style={{ color: 'var(--foreground)' }}
+                className="w-full bg-transparent border border-white/20 hover:bg-white/10 py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors text-white"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
                 <span>New Chat</span>
               </button>
@@ -229,13 +229,12 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         <div className="flex-shrink-0 p-4">
           <button
             onClick={handleNewChat}
-            className={`w-full bg-gray-300 hover:bg-gray-400 ${isCollapsed ? "py-2" : "py-2 px-4"} rounded-lg flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors`}
+            className={`w-full border border-gray-300 ${isCollapsed ? "py-2" : "py-2 px-4"} rounded-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors cursor-pointer`}
             style={{ color: 'var(--foreground)' }}
             title={isCollapsed ? 'New Chat' : ''}
+            type="button"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
+            <SquarePen size={isCollapsed ? 12 : 18} />
             {!isCollapsed && <span>New Chat</span>}
           </button>
         </div>
