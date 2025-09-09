@@ -6,6 +6,7 @@ import UserMessage from '@/components/UserMessage'
 import AssistantMessage from '@/components/AssistantMessage'
 import LoadingMessage from '@/components/LoadingMessage'
 import ChatInput from '@/components/ChatInput'
+import { siteConfig } from '@/lib/site-config'
 
 // Re-define Message interface here or import from a shared type file if available
 interface Message {
@@ -27,12 +28,22 @@ export default function ChatPage() {
     const hour = now.getHours()
 
     if (hour < 12) {
-      return 'Good morning'
+      return siteConfig.chat.greeting.morning
     } else if (hour < 18) {
-      return 'Good afternoon'
+      return siteConfig.chat.greeting.afternoon
     } else {
-      return 'Good evening'
+      return siteConfig.chat.greeting.evening
     }
+  }
+
+  // Get recommendation questions from site config
+  const recommendationQuestions = siteConfig.chat.recommendationQuestions
+
+  // Function to handle clicking on a recommendation question
+  const handleRecommendationClick = (question: string) => {
+    setInput(question)
+    // Optionally auto-submit the question
+    // handleSubmit(new Event('submit') as any)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,14 +114,31 @@ function greet(name) {
             {messages.length === 0 ? (
               // Welcome placeholder for new chats
               <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="text-center space-y-4">
+                <div className="text-center space-y-6 max-w-4xl">
                   <div className="text-4xl mb-4">👋</div>
                   <h1 className="text-2xl font-semibold" style={{ color: 'var(--accent)' }}>
                     {getGreeting()}, {session?.user?.name || 'there'}!
                   </h1>
-                  <p className="text-gray-600 max-w-md">
-                    I&apos;m your AI assistant. Start a conversation by typing a message below.
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    {siteConfig.chat.welcomeMessage}
                   </p>
+                  
+                  {/* Recommendation Questions */}
+                  <div className="mt-8 flex gap-3 max-w-full flex-wrap justify-center">
+                    {recommendationQuestions.slice(0, 6).map((question, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleRecommendationClick(question)}
+                        className="p-4 text-left rounded-full border hover:border-gray-300 hover:bg-gray-50 transition-colors duration-200 text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+                        style={{ 
+                          borderColor: 'var(--accent)',
+                          backgroundColor: 'var(--card)',
+                        }}
+                      >
+                        <span className="block truncate">{question}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (
