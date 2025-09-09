@@ -122,12 +122,11 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             <div className="flex-shrink-0 p-4">
               <button
                 onClick={handleNewChat}
-                className="w-full bg-transparent border border-white/20 hover:bg-white/10 py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors text-white"
+                className="w-full border border-gray-300 py-2.5 px-4 rounded-full flex items-center justify-center space-x-2 transition-colors hover:bg-gray-200"
+                style={{ color: 'var(--foreground)' }}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                <span>New Chat</span>
+                <SquarePen className="w-4 h-4" />
+                <span className="text-gray-500">New Chat</span>
               </button>
             </div>
 
@@ -233,12 +232,13 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         <div className="flex-shrink-0 p-4">
           <button
             onClick={handleNewChat}
-            className={`w-full ${isCollapsed ? "" : "border border-gray-300"}  ${isCollapsed ? "py-2" : "py-2 px-4"} rounded-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors cursor-pointer text-gray-400`}
+            className={`w-full ${!isCollapsed && "border border-gray-300"}  ${isCollapsed ? "py-2" : "py-2 px-3"} rounded-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors hover:bg-gray-200`}
+            style={{ color: 'var(--foreground)' }}
             title={isCollapsed ? 'New Chat' : ''}
             type="button"
           >
-            <SquarePen className={`${isCollapsed ? "w-4 h-4" : "w-5 h-5"}`}/>
-            {!isCollapsed && <span>New Chat</span>}
+            <SquarePen className={`${isCollapsed ? "w-4 h-4" : "w-4 h-4"} ${ isCollapsed ? "text-gray-500" : "text-gray-400"}`}/>
+            {!isCollapsed && <span className="text-gray-500">New Chat</span>}
           </button>
         </div>
 
