@@ -141,6 +141,25 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const pathname = usePathname()
   const siteConfig = getSiteConfig()
 
+  // Load isPinned state from localStorage on component mount
+  useEffect(() => {
+    const savedPinnedState = localStorage.getItem('sidebarPinned')
+    if (savedPinnedState) {
+      setIsPinned(JSON.parse(savedPinnedState))
+    }
+  }, [])
+
+  // Save isPinned state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('sidebarPinned', JSON.stringify(isPinned))
+  }, [isPinned])
+
+  // Custom signOut function that clears localStorage
+  const handleSignOut = () => {
+    localStorage.removeItem('sidebarPinned')
+    signOut()
+  }
+
   // Get grouped chat history
   const groupedChats = getGroupedChatHistory()
 
@@ -324,7 +343,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
                   </div>
                 </div>
                 <button
-                  onClick={() => signOut()}
+                  onClick={handleSignOut}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                   title="Sign out"
                 >
@@ -445,7 +464,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             </div>
             {!isCollapsed && (
               <button
-                onClick={() => signOut()}
+                onClick={handleSignOut}
                 className="text-gray-500 hover:text-gray-700 transition-colors"
                 title="Sign out"
               >
