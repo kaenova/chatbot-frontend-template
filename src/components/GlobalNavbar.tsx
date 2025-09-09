@@ -16,13 +16,83 @@ interface GlobalNavbarProps {
   user: User
 }
 
+// Helper component to render chat group sections
+interface ChatGroupProps {
+  title: string
+  chats: { id: string; title: string; date: string; createdAt: Date }[]
+  onChatClick: (chatId: string) => void
+  isCollapsed?: boolean
+  isMobile?: boolean
+}
+
+function ChatGroup({ title, chats, onChatClick, isCollapsed = false, isMobile = false }: ChatGroupProps) {
+  if (chats.length === 0) return null
+
+  if (isCollapsed) {
+    // For collapsed desktop view, just show icons without grouping
+    return (
+      <>
+        {chats.map((chat) => (
+          <button
+            key={chat.id}
+            onClick={() => onChatClick(chat.id)}
+            className="w-full p-2 rounded-lg hover:bg-gray-200 transition-colors flex justify-center"
+            title={chat.title}
+          >
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
+            </svg>
+          </button>
+        ))}
+      </>
+    )
+  }
+
+  return (
+    <div className="mb-4">
+      <h3 className="text-sm font-bold text-[var(--accent)] mb-2 px-2">{title}</h3>
+      <div className="space-y-1">
+        {chats.map((chat) => (
+          <div key={chat.id} className={isMobile ? "group" : ""}>
+            <div
+              className={`flex items-center justify-between p-3 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors ${isMobile ? "" : "group"}`}
+              onClick={() => onChatClick(chat.id)}
+            >
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                {isMobile && (
+                  <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
+                  </svg>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{chat.title}</p>
+                  {isMobile && <p className="text-xs text-gray-500">{chat.date}</p>}
+                  {!isMobile && <p className="text-xs text-gray-500 mt-1">{chat.date}</p>}
+                </div>
+              </div>
+              <button className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-gray-700 p-1 transition-all">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const { chatHistory } = useChat()
+  const { getGroupedChatHistory } = useChat()
   const router = useRouter()
   const pathname = usePathname()
   const siteConfig = getSiteConfig()
+
+  // Get grouped chat history
+  const groupedChats = getGroupedChatHistory()
 
   // Get mobile title based on current page
   const getMobileTitle = () => {
@@ -30,7 +100,14 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
       // For chat pages, find current chat title or use "New Chat"
       const chatId = pathname.split('/chat/')[1]
       if (chatId) {
-        const currentChat = chatHistory.find(chat => chat.id === chatId)
+        const allChats = [
+          ...groupedChats.today,
+          ...groupedChats.yesterday,
+          ...groupedChats.previous7Days,
+          ...groupedChats.previous30Days,
+          ...groupedChats.older
+        ]
+        const currentChat = allChats.find(chat => chat.id === chatId)
         return currentChat?.title || 'Chat'
       }
       return 'New Chat'
@@ -119,7 +196,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             </div>
 
             {/* New Chat Button */}
-            <div className="flex-shrink-0 p-4">
+            <div className="flex-shrink-0 p-4 pt-0">
               <button
                 onClick={handleNewChat}
                 className="w-full border border-gray-300 py-2.5 px-4 rounded-full flex items-center justify-center space-x-2 transition-colors hover:bg-gray-200"
@@ -136,38 +213,17 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             {/* Chat History - Scrollable */}
             <div className="flex-1 overflow-y-auto min-h-0">
               <div className="px-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-3">Recent Chats</h3>
-                <div className="space-y-2">
-                  {chatHistory.map((chat) => (
-                    <div key={chat.id} className="group">
-                      <div
-                        className="flex items-center justify-between p-3 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
-                        onClick={() => handleChatClick(chat.id)}
-                      >
-                        <div className="flex items-center space-x-3 flex-1 min-w-0">
-                          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
-                          </svg>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm truncate" style={{ color: 'var(--foreground)' }}>{chat.title}</p>
-                            <p className="text-xs text-gray-500">{chat.date}</p>
-                          </div>
-                        </div>
-                        <button className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-gray-700 p-1 transition-all">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} isMobile={true} />
+                <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} isMobile={true} />
+                <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} isMobile={true} />
+                <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} isMobile={true} />
+                <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} isMobile={true} />
               </div>
             </div>
 
             {/* Menu Button */}
             <div className="flex-shrink-0 px-4 pb-4">
-              <MenuButton isCollapsed={isCollapsed} />
+              <MenuButton isCollapsed={false} />
             </div>
 
             {/* User Profile Section */}
@@ -220,11 +276,11 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         onMouseLeave={() => setTimeout( () => {setIsCollapsed(true)}, 500) }
       >
         {/* Logo Section */}
-        <div className="flex-shrink-0 p-4 border-b border-gray-300 space-y-5">
+        <div className="flex-shrink-0 p-4 space-y-5">
           <Logo showText={!isCollapsed} />
           {
             isCollapsed ? null :
-              <h1 className="font-bold text-center text-[var(--accent)]">{siteConfig.name}</h1>
+              <h1 className="font-bold text-left text-[var(--accent)]">{siteConfig.name}</h1>
           }
         </div>
 
@@ -248,28 +304,11 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {/* Chat History - Scrollable */}
         {!isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-4 modern-scrollbar">
-            <h2 className="text-sm font-medium text-gray-500 mb-3">Recent Chats</h2>
-            <div className="space-y-1">
-              {chatHistory.map((chat) => (
-                <button
-                  key={chat.id}
-                  onClick={() => handleChatClick(chat.id)}
-                  className="w-full text-left p-3 rounded-lg hover:bg-gray-200 transition-colors group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{chat.title}</h3>
-                      <p className="text-xs text-gray-500 mt-1">{chat.date}</p>
-                    </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
+            <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} />
+            <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} />
+            <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} />
+            <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} />
+            <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} />
           </div>
         )}
 
@@ -277,25 +316,16 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-2 py-4 my-2 no-scrollbar">
             <div className="space-y-2">
-              {chatHistory.map((chat) => (
-                <button
-                  key={chat.id}
-                  onClick={() => handleChatClick(chat.id)}
-                  className="w-full p-2 rounded-lg hover:bg-gray-200 transition-colors flex justify-center"
-                  title={chat.title}
-                >
-                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
-                  </svg>
-                </button>
-              ))}
+              <ChatGroup title="" chats={groupedChats.today} onChatClick={handleChatClick} isCollapsed={true} />
+              <ChatGroup title="" chats={groupedChats.yesterday} onChatClick={handleChatClick} isCollapsed={true} />
+              <ChatGroup title="" chats={groupedChats.previous7Days} onChatClick={handleChatClick} isCollapsed={true} />
+              <ChatGroup title="" chats={groupedChats.previous30Days} onChatClick={handleChatClick} isCollapsed={true} />
+              <ChatGroup title="" chats={groupedChats.older} onChatClick={handleChatClick} isCollapsed={true} />
             </div>
           </div>
         )}
 
         {/* Menu Button */}
-
-        {/* User Profile Section */}
         <div className="flex-shrink-0 p-4 border-t border-gray-300 sticky bottom-0" style={{ backgroundColor: 'var(--sidebar-bg)' }}>
           <div className="flex-shrink-0 pb-4">
             <MenuButton isCollapsed={isCollapsed} />
