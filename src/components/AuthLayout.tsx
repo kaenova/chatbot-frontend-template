@@ -15,12 +15,12 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen" style={{ backgroundColor: 'var(--background)' }}>
       {/* Global Navbar */}
       <GlobalNavbar user={session.user} />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
         {children}
       </main>
     </div>

@@ -31,14 +31,14 @@ export default function ChatHeader({ title, onTitleChange, onMobileMenuToggle }:
   }
 
   return (
-    <header className="bg-gray-50/60 backdrop-blur-xl border-b border-white/30 px-4 py-3 flex items-center justify-between w-full shadow-sm">
+    <header className="backdrop-blur-xl border-b border-white/30 px-4 py-3 flex items-center justify-between w-full shadow-sm" style={{ backgroundColor: 'var(--header-bg)' }}>
       {/* Mobile Menu Button - Only visible on mobile */}
       <button
         onClick={onMobileMenuToggle}
-        className="md:hidden p-2 rounded-lg hover:bg-gray-200/50 transition-colors border border-gray-300/50"
+        className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors border border-white/30"
         title="Open menu"
       >
-        <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
@@ -52,14 +52,14 @@ export default function ChatHeader({ title, onTitleChange, onMobileMenuToggle }:
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleTitleSubmit}
             onKeyDown={handleKeyPress}
-            className="text-lg font-semibold text-gray-800 bg-transparent border-b-2 border-blue-500 outline-none text-center max-w-xs"
+            className="text-lg font-semibold text-white bg-transparent border-b-2 border-white outline-none text-center max-w-xs placeholder-white/70"
             autoFocus
             placeholder="Enter chat title"
           />
         ) : (
           <button
             onClick={() => setIsEditing(true)}
-            className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors px-2 py-1 rounded hover:bg-gray-50"
+            className="text-lg font-semibold text-white hover:text-white/80 transition-colors px-2 py-1 rounded hover:bg-white/10"
             title="Click to edit title"
           >
             {title}

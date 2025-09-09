@@ -23,13 +23,13 @@ export default function ResourceManagementPage() {
   }
 
   return (
-    <div className="flex-1 p-8 pt-20 md:pt-8">
+    <div className="flex-1 p-8 pt-20 md:pt-8" style={{ backgroundColor: 'var(--background)' }}>
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Resource Management</h1>
+        <h1 className="text-3xl font-bold mb-8" style={{ color: 'var(--foreground)' }}>Resource Management</h1>
 
         {/* File Upload Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Upload Files</h2>
+        <div className="rounded-lg shadow-sm border border-gray-200 p-6 mb-6" style={{ backgroundColor: 'var(--background)' }}>
+          <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--foreground)' }}>Upload Files</h2>
 
           <div className="space-y-4">
             <div>
@@ -59,7 +59,8 @@ export default function ResourceManagementPage() {
             <button
               onClick={handleUpload}
               disabled={files.length === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-white rounded-lg hover:opacity-80 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              style={{ backgroundColor: 'var(--accent)' }}
             >
               Upload Files
             </button>
@@ -67,8 +68,8 @@ export default function ResourceManagementPage() {
         </div>
 
         {/* Uploaded Files Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Uploaded Files</h2>
+        <div className="rounded-lg shadow-sm border border-gray-200 p-6" style={{ backgroundColor: 'var(--background)' }}>
+          <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--foreground)' }}>Uploaded Files</h2>
 
           {uploadedFiles.length === 0 ? (
             <p className="text-gray-500">No files uploaded yet.</p>
@@ -80,7 +81,7 @@ export default function ResourceManagementPage() {
                     <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span className="text-sm text-gray-900">{fileName}</span>
+                    <span className="text-sm" style={{ color: 'var(--foreground)' }}>{fileName}</span>
                   </div>
                   <button
                     onClick={() => handleDelete(fileName)}

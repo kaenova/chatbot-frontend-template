@@ -9,7 +9,7 @@ interface ChatInputProps {
 
 export default function ChatInput({ input, setInput, handleSubmit, isLoading }: ChatInputProps) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-100 via-gray-100 to-transparent pt-14">
+    <div className="absolute bottom-0 left-0 right-0 pt-14" style={{ background: `linear-gradient(to top, var(--background), var(--background), transparent)` }}>
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-6 pb-6">
         <div className="flex space-x-4 items-start">
           <div className="flex-1">
@@ -23,13 +23,15 @@ export default function ChatInput({ input, setInput, handleSubmit, isLoading }: 
                 }
               }}
               placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
-              className="resize-y bg-white w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg min-h-[56px] text-black"
-              rows={1}
-              disabled={isLoading}
-              style={{
+              className="resize-y w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent shadow-lg min-h-[56px]"
+              style={{ 
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
                 height: 'auto',
                 minHeight: '56px'
               }}
+              rows={1}
+              disabled={isLoading}
               onInput={(e) => {
                 const target = e.target as HTMLTextAreaElement
                 target.style.height = 'auto'
@@ -40,7 +42,8 @@ export default function ChatInput({ input, setInput, handleSubmit, isLoading }: 
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-4 rounded-xl transition-colors shadow-lg flex-shrink-0 h-[56px] w-[56px] flex items-center justify-center"
+            className="hover:opacity-80 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-4 rounded-xl transition-colors shadow-lg flex-shrink-0 h-[56px] w-[56px] flex items-center justify-center"
+            style={{ backgroundColor: 'var(--accent)' }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

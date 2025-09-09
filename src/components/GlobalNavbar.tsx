@@ -64,21 +64,21 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-gray-50/60 backdrop-blur-xl border-b border-white/30 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b border-white/30 px-4 py-3 flex items-center justify-between shadow-sm" style={{ backgroundColor: 'var(--header-bg)' }}>
         {/* Burger Menu Button */}
         <button
           onClick={() => setIsMobileSidebarOpen(true)}
-          className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors border border-gray-300/50"
+          className="p-2 rounded-lg hover:bg-white/10 transition-colors border border-white/30"
           title="Open menu"
         >
-          <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
         {/* Title */}
         <div className="flex-1 flex justify-center">
-          <h1 className="text-lg font-semibold text-gray-800">
+          <h1 className="text-lg font-semibold text-white">
             {getMobileTitle()}
           </h1>
         </div>
@@ -97,21 +97,22 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
           />
 
           {/* Mobile Sidebar */}
-          <div className="fixed inset-0 w-full bg-gray-900 text-white flex flex-col z-50 md:hidden transform transition-transform duration-300 ease-in-out translate-x-0 max-h-screen overflow-hidden">
+          <div className="fixed inset-0 w-full text-white flex flex-col z-50 md:hidden transform transition-transform duration-300 ease-in-out translate-x-0 max-h-screen overflow-hidden" style={{ backgroundColor: 'var(--sidebar-bg)' }}>
             {/* Header with Close Button */}
-            <div className="flex-shrink-0 p-4 border-b border-gray-700 flex items-center justify-between">
+            <div className="flex-shrink-0 p-4 border-b border-gray-300 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 </div>
-                <h1 className="text-xl font-semibold">ChatGPT Clone</h1>
+                <h1 className="text-xl font-semibold" style={{ color: 'var(--accent)' }}>ChatGPT Clone</h1>
               </div>
               <button
                 onClick={() => setIsMobileSidebarOpen(false)}
-                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                 title="Close menu"
+                style={{ color: 'var(--foreground)' }}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -123,7 +124,8 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             <div className="flex-shrink-0 p-4">
               <button
                 onClick={handleNewChat}
-                className="w-full bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+                className="w-full bg-gray-300 hover:bg-gray-400 py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+                style={{ color: 'var(--foreground)' }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -135,24 +137,24 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             {/* Chat History - Scrollable */}
             <div className="flex-1 overflow-y-auto min-h-0">
               <div className="px-4">
-                <h3 className="text-sm font-medium text-gray-400 mb-3">Recent Chats</h3>
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Recent Chats</h3>
                 <div className="space-y-2">
                   {chatHistory.map((chat) => (
                     <div key={chat.id} className="group">
                       <div
-                        className="flex items-center justify-between p-3 hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
+                        className="flex items-center justify-between p-3 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
                         onClick={() => handleChatClick(chat.id)}
                       >
                         <div className="flex items-center space-x-3 flex-1 min-w-0">
-                          <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
                           </svg>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-white truncate">{chat.title}</p>
-                            <p className="text-xs text-gray-400">{chat.date}</p>
+                            <p className="text-sm truncate" style={{ color: 'var(--foreground)' }}>{chat.title}</p>
+                            <p className="text-xs text-gray-500">{chat.date}</p>
                           </div>
                         </div>
-                        <button className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white p-1 transition-all">
+                        <button className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-gray-700 p-1 transition-all">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
@@ -170,7 +172,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             </div>
 
             {/* User Profile Section */}
-            <div className="flex-shrink-0 p-4 border-t border-gray-700">
+            <div className="flex-shrink-0 p-4 border-t border-gray-300">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   {user.image ? (
@@ -182,22 +184,22 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
                       className="w-8 h-8 rounded-full"
                     />
                   ) : (
-                    <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                       </svg>
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>
                       {user.name || user.email}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => signOut()}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
                   title="Sign out"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,21 +214,22 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden md:flex h-screen bg-gray-900 text-white  flex-col transition-all duration-300 ease-in-out overflow-scroll overflow-x-clip no-scrollbar ${
+        className={`hidden md:flex md:border-r border-gray-300 h-screen text-white flex-col transition-all duration-300 ease-in-out overflow-scroll overflow-x-clip no-scrollbar ${
           isCollapsed ? 'w-16' : 'w-80'
         }`}
+        style={{ backgroundColor: 'var(--sidebar-bg)', color: 'var(--foreground)' }}
         onMouseEnter={() => setIsCollapsed(false)}
         onMouseLeave={() => setIsCollapsed(true)}
       >
         {/* Logo Section */}
-        <div className="flex-shrink-0 p-4 border-b border-gray-700">
+        <div className="flex-shrink-0 p-4 border-b border-gray-300">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
             </div>
-            {!isCollapsed && <h1 className="text-xl font-semibold">ChatGPT Clone</h1>}
+            {!isCollapsed && <h1 className="text-xl font-semibold" style={{ color: 'var(--accent)' }}>ChatGPT Clone</h1>}
           </div>
         </div>
 
@@ -234,7 +237,8 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         <div className="flex-shrink-0 p-4">
           <button
             onClick={handleNewChat}
-            className={`w-full bg-gray-700 hover:bg-gray-600 text-white ${isCollapsed ? "py-2" : "py-2 px-4"} rounded-lg flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors`}
+            className={`w-full bg-gray-300 hover:bg-gray-400 ${isCollapsed ? "py-2" : "py-2 px-4"} rounded-lg flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors`}
+            style={{ color: 'var(--foreground)' }}
             title={isCollapsed ? 'New Chat' : ''}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,21 +251,21 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {/* Chat History - Scrollable */}
         {!isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-4 modern-scrollbar">
-            <h2 className="text-sm font-medium text-gray-400 mb-3">Recent Chats</h2>
+            <h2 className="text-sm font-medium text-gray-500 mb-3">Recent Chats</h2>
             <div className="space-y-1">
               {chatHistory.map((chat) => (
                 <button
                   key={chat.id}
                   onClick={() => handleChatClick(chat.id)}
-                  className="w-full text-left p-3 rounded-lg hover:bg-gray-800 transition-colors group"
+                  className="w-full text-left p-3 rounded-lg hover:bg-gray-200 transition-colors group"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-white truncate">{chat.title}</h3>
-                      <p className="text-xs text-gray-400 mt-1">{chat.date}</p>
+                      <h3 className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{chat.title}</h3>
+                      <p className="text-xs text-gray-500 mt-1">{chat.date}</p>
                     </div>
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </div>
@@ -280,10 +284,10 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
                 <button
                   key={chat.id}
                   onClick={() => handleChatClick(chat.id)}
-                  className="w-full p-2 rounded-lg hover:bg-gray-800 transition-colors flex justify-center"
+                  className="w-full p-2 rounded-lg hover:bg-gray-200 transition-colors flex justify-center"
                   title={chat.title}
                 >
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
                   </svg>
                 </button>
@@ -295,7 +299,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {/* Menu Button */}
 
         {/* User Profile Section */}
-        <div className="flex-shrink-0 p-4 border-t border-gray-700 sticky bottom-0 bg-gray-900">
+        <div className="flex-shrink-0 p-4 border-t border-gray-300 sticky bottom-0" style={{ backgroundColor: 'var(--sidebar-bg)' }}>
           <div className="flex-shrink-0 pb-4">
             <MenuButton isCollapsed={isCollapsed} />
           </div>
@@ -310,7 +314,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
                   className="w-8 h-8 rounded-full"
                 />
               ) : (
-                <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                   </svg>
@@ -318,17 +322,17 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
               )}
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>
                     {user.name || user.email}
                   </p>
-                  <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
                 </div>
               )}
             </div>
             {!isCollapsed && (
               <button
                 onClick={() => signOut()}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-500 hover:text-gray-700 transition-colors"
                 title="Sign out"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

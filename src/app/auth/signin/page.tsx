@@ -48,15 +48,15 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--background)' }}>
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 bg-black rounded-lg flex items-center justify-center">
+          <div className="mx-auto h-12 w-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
             <svg className="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--accent)' }}>
             Welcome to ChatGPT Clone
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -77,7 +77,12 @@ export default function SignIn() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 rounded-t-md focus:outline-none focus:ring-2 focus:border-transparent focus:z-10 sm:text-sm"
+              style={{ 
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
+                borderColor: 'var(--accent)'
+              }}
               placeholder="Email address"
             />
           </div>
@@ -93,7 +98,12 @@ export default function SignIn() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 rounded-b-md focus:outline-none focus:ring-2 focus:border-transparent focus:z-10 sm:text-sm"
+              style={{ 
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
+                borderColor: 'var(--accent)'
+              }}
               placeholder="Password"
             />
           </div>
@@ -108,7 +118,8 @@ export default function SignIn() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
+              style={{ backgroundColor: 'var(--accent)' }}
             >
               {isLoading ? (
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -127,14 +138,18 @@ export default function SignIn() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
+              <span className="px-2 text-gray-500" style={{ backgroundColor: 'var(--background)' }}>Or continue with</span>
             </div>
           </div>
 
           <div className="mt-6 space-y-3">
             <button
               onClick={handleMockSignIn}
-              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{ 
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)'
+              }}
             >
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -144,7 +159,11 @@ export default function SignIn() {
             <button
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
+              style={{ 
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)'
+              }}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

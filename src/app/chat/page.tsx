@@ -96,7 +96,7 @@ function greet(name) {
   }, [messages])
 
   return (
-    <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden">
+    <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden" style={{ backgroundColor: 'var(--background)' }}>
       {/* Chat Messages - Full Height */}
       <div id="main-message" className="flex-1 overflow-y-auto p-6 pb-32 scroll-smooth no-scrollbar md:pt-6 pt-20">
           <div className="max-w-4xl mx-auto space-y-6">
@@ -105,10 +105,10 @@ function greet(name) {
               <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="text-center space-y-4">
                   <div className="text-4xl mb-4">👋</div>
-                  <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-500">
+                  <h1 className="text-2xl font-semibold" style={{ color: 'var(--accent)' }}>
                     {getGreeting()}, {session?.user?.name || 'there'}!
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-md">
+                  <p className="text-gray-600 max-w-md">
                     I&apos;m your AI assistant. Start a conversation by typing a message below.
                   </p>
                 </div>
