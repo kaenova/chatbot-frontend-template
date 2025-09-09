@@ -9,7 +9,7 @@ import { useChat } from "@/contexts/ChatContext"
 import MenuButton from "./MenuButton"
 import Logo from "./Logo"
 import ChatSearch from "./ChatSearch"
-import { getSiteConfig } from "@/lib/site-config"
+import { getSiteConfig, getPageTitle } from "@/lib/site-config"
 import { SquarePen, PanelRightClose, PanelRightOpen } from "lucide-react"
 
 interface GlobalNavbarProps {
@@ -95,7 +95,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   // Get grouped chat history
   const groupedChats = getGroupedChatHistory()
 
-  // Get mobile title based on current page
+  // Get mobile title based on current page - use centralized function
   const getMobileTitle = () => {
     if (pathname.startsWith('/chat')) {
       // For chat pages, find current chat title or use "New Chat"
@@ -112,12 +112,10 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         return currentChat?.title || 'Chat'
       }
       return 'New Chat'
-    } else if (pathname.startsWith('/resource-management')) {
-      return 'Resource Management'
-    } else if (pathname.startsWith('/settings')) {
-      return 'Settings'
     }
-    return 'Dashboard'
+    
+    // Use centralized page title function for other pages
+    return getPageTitle(pathname)
   }
 
   // Handle chat item click

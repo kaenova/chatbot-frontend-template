@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://chatgpt-clone.com/sitemap.xml
+
+# Disallow sensitive areas
+Disallow: /api/
+Disallow: /auth/

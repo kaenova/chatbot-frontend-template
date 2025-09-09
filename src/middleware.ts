@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
   // Otherwise, use real NextAuth middleware
   console.log('[MIDDLEWARE REAL] Using NextAuth middleware for:', request.nextUrl.pathname)
   const { auth } = await import("@/auth")
-  // @ts-ignore - NextAuth middleware typing issue
+  // @ts-expect-error - NextAuth middleware typing issue
   return auth(request)
 }
 

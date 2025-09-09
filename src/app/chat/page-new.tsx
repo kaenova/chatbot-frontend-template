@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import ChatHeader from '@/components/ChatHeader'
-import MobileSidebar from '@/components/MobileSidebar'
 
 interface Message {
   id: string
@@ -15,9 +13,7 @@ interface Message {
 }
 
 export default function ChatPage() {
-  const { data: session } = useSession()
   const [chatTitle, setChatTitle] = useState('New Chat')
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -82,7 +78,7 @@ function greet(name) {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        setIsMobileSidebarOpen(false)
+        // No action needed - GlobalNavbar handles mobile sidebar
       }
     }
     
@@ -91,22 +87,15 @@ function greet(name) {
   }, [])
 
   return (
-    <>
-      {/* Mobile Sidebar */}
-      {session?.user && (
-        <MobileSidebar 
-          user={session.user}
-          isOpen={isMobileSidebarOpen}
-          onClose={() => setIsMobileSidebarOpen(false)}
-        />
-      )}
-      
+    <>      
       <div className="flex-1 flex flex-col relative">
         {/* Chat Header */}
         <ChatHeader
           title={chatTitle}
           onTitleChange={setChatTitle}
-          onMobileMenuToggle={() => setIsMobileSidebarOpen(true)}
+          onMobileMenuToggle={() => {
+            // Mobile menu toggle is handled by GlobalNavbar
+          }}
         />
         
         {/* Chat Messages - Full Height with Floating Input */}
