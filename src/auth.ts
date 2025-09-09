@@ -1,15 +1,15 @@
-import NextAuth from "next-auth"
-import Google from "next-auth/providers/google"
-import Credentials from "next-auth/providers/credentials"
-import { NextAuthConfig } from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
+import { getServerSession } from "next-auth/next"
+import GoogleProvider from "next-auth/providers/google"
+import CredentialsProvider from "next-auth/providers/credentials"
 
-const config: NextAuthConfig = {
+export const authOptions: NextAuthOptions = {
   providers: [
-    Google({
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    Credentials({
+    CredentialsProvider({
       name: "credentials",
       credentials: {
         username: { label: "Username", type: "text" },
@@ -44,23 +44,50 @@ const config: NextAuthConfig = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   pages: {
     signIn: "/auth/signin",
   },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user
-      const isOnChat = nextUrl.pathname.startsWith('/chat')
-      
-      if (isOnChat) {
-        if (isLoggedIn) return true
-        return false // Redirect unauthenticated users to login page
-      } else if (isLoggedIn) {
-        return Response.redirect(new URL('/chat', nextUrl))
+    async jwt({ token, user, account }) {
+      // Persist the OAuth access_token and or the user id to the token right after signin
+      if (account && user) {
+        token.accessToken = account.access_token
+        token.userId = user.id
+        token.provider = account.provider
       }
-      return true
+      
+      // Add custom fields to JWT
+      if (user) {
+        token.id = user.id
+        token.email = user.email
+        token.name = user.name
+        token.image = user.image
+      }
+      
+      return token
+    },
+    async session({ session, token }) {
+      // Send properties to the client
+      if (token && session.user) {
+        session.user.id = token.userId as string || token.id as string
+        if (token.email) session.user.email = token.email as string
+        if (token.name) session.user.name = token.name as string
+        if (token.image) session.user.image = token.image as string
+        // Custom session properties handled by our extended types
+        session.accessToken = token.accessToken as string
+        session.provider = token.provider as string
+      }
+      
+      return session
     },
   },
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config)
+export default NextAuth(authOptions)
+
+// Helper function to get session server-side
+export const getAuthSession = () => getServerSession(authOptions)

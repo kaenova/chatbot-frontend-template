@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getToken } from "next-auth/jwt"
 import { shouldUseMockAuth } from "@/lib/dev-config"
 
 export async function middleware(request: NextRequest) {
@@ -10,9 +11,31 @@ export async function middleware(request: NextRequest) {
 
   // Otherwise, use real NextAuth middleware
   console.log('[MIDDLEWARE REAL] Using NextAuth middleware for:', request.nextUrl.pathname)
-  const { auth } = await import("@/auth")
-  // @ts-expect-error - NextAuth middleware typing issue
-  return auth(request)
+  
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET 
+  })
+  
+  const isLoggedIn = !!token
+  const isOnChat = request.nextUrl.pathname.startsWith('/chat')
+  const isOnSettings = request.nextUrl.pathname.startsWith('/settings')
+  const isOnResourceManagement = request.nextUrl.pathname.startsWith('/resource-management')
+  const isOnAuth = request.nextUrl.pathname.startsWith('/auth')
+  const isOnRoot = request.nextUrl.pathname === '/'
+  
+  // Protected paths that require authentication
+  const protectedPaths = isOnChat || isOnSettings || isOnResourceManagement
+  
+  if (protectedPaths) {
+    if (isLoggedIn) return NextResponse.next()
+    // Redirect unauthenticated users to login page
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
+  } else if (isLoggedIn && (isOnAuth || isOnRoot)) {
+    return NextResponse.redirect(new URL('/chat', request.url))
+  }
+  
+  return NextResponse.next()
 }
 
 export const config = {
