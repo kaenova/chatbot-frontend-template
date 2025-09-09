@@ -8,7 +8,7 @@ import { getSiteConfig } from "@/lib/site-config"
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false)
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
@@ -21,13 +21,13 @@ export default function SignIn() {
 
     try {
       const result = await signIn('credentials', {
-        email,
+        username,
         password,
         redirect: false,
       })
 
       if (result?.error) {
-        setError("Invalid email or password")
+        setError("Invalid username or password")
       } else {
         router.push('/chat')
       }
@@ -62,29 +62,33 @@ export default function SignIn() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Sign in to continue to your conversations
+            <br />
+            <span className="text-xs text-gray-500 mt-1 block">
+              Demo: username &quot;user&quot;, password &quot;pass&quot;
+            </span>
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleCredentialsSignIn}>
           <div>
-            <label htmlFor="email" className="sr-only">
-              Email address
+            <label htmlFor="username" className="sr-only">
+              Username
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
+              id="username"
+              name="username"
+              type="text"
+              autoComplete="username"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 rounded-t-md focus:outline-none focus:ring-2 focus:border-transparent focus:z-10 sm:text-sm"
               style={{ 
                 backgroundColor: 'var(--background)',
                 color: 'var(--foreground)',
                 borderColor: 'var(--accent)'
               }}
-              placeholder="Email address"
+              placeholder="Username"
             />
           </div>
           <div>

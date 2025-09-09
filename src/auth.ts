@@ -12,21 +12,31 @@ const config: NextAuthConfig = {
     Credentials({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.username || !credentials?.password) {
           return null
         }
 
-        // For demo purposes, accept any email with password "password"
+        // Mock user credentials
+        if (credentials.username === "user" && credentials.password === "pass") {
+          return {
+            id: "mock-user-1",
+            email: "user@example.com",
+            name: "User",
+            image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+          }
+        }
+
+        // For demo purposes, also accept any email with password "password"
         // In a real app, you would validate against your database
         if (credentials.password === "password") {
           return {
             id: "1",
-            email: credentials.email as string,
-            name: (credentials.email as string).split("@")[0],
+            email: credentials.username as string,
+            name: (credentials.username as string).split("@")[0],
           }
         }
 
