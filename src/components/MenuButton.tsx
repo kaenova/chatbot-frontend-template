@@ -48,7 +48,7 @@ export default function MenuButton({ isCollapsed = false }: MenuButtonProps) {
       </button>
 
       {/* Popover */}
-      {isOpen && (
+      {isOpen && !isCollapsed && (
         <>
           {/* Backdrop */}
           <div

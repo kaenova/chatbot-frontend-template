@@ -164,7 +164,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
 
             {/* Menu Button */}
             <div className="flex-shrink-0 px-4 pb-4">
-              <MenuButton />
+              <MenuButton isCollapsed={isCollapsed} />
             </div>
 
             {/* User Profile Section */}
