@@ -19,13 +19,14 @@ interface GlobalNavbarProps {
 // Helper component to render chat group sections
 interface ChatGroupProps {
   title: string
-  chats: { id: string; title: string; date: string; createdAt: Date }[]
+  chats: { id: string; title: string; date: string; createdAt: Date; isPinned: boolean }[]
   onChatClick: (chatId: string) => void
+  onTogglePin?: (chatId: string) => void
   isCollapsed?: boolean
   isMobile?: boolean
 }
 
-function ChatGroup({ title, chats, onChatClick, isCollapsed = false, isMobile = false }: ChatGroupProps) {
+function ChatGroup({ title, chats, onChatClick, onTogglePin, isCollapsed = false, isMobile = false }: ChatGroupProps) {
   if (chats.length === 0) return null
 
   if (isCollapsed) {
@@ -36,12 +37,15 @@ function ChatGroup({ title, chats, onChatClick, isCollapsed = false, isMobile = 
           <button
             key={chat.id}
             onClick={() => onChatClick(chat.id)}
-            className="w-full p-2 rounded-lg hover:bg-gray-200 transition-colors flex justify-center"
+            className="w-full p-2 rounded-lg hover:bg-gray-200 transition-colors flex justify-center relative"
             title={chat.title}
           >
             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
             </svg>
+            {chat.isPinned && (
+              <div className="absolute top-0 right-0 w-2 h-2 bg-yellow-400 rounded-full transform translate-x-1 -translate-y-1"></div>
+            )}
           </button>
         ))}
       </>
@@ -50,7 +54,14 @@ function ChatGroup({ title, chats, onChatClick, isCollapsed = false, isMobile = 
 
   return (
     <div className="mb-4">
-      <h3 className="text-sm font-bold text-[var(--accent)] mb-2 px-2">{title}</h3>
+      <h3 className="text-sm font-bold text-[var(--accent)] mb-2 px-2 flex items-center">
+        {title}
+        {title === "Pinned" && (
+          <svg className="w-4 h-4 ml-1 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+          </svg>
+        )}
+      </h3>
       <div className="space-y-1">
         {chats.map((chat) => (
           <div key={chat.id} className={isMobile ? "group" : ""}>
@@ -60,21 +71,49 @@ function ChatGroup({ title, chats, onChatClick, isCollapsed = false, isMobile = 
             >
               <div className="flex items-center space-x-3 flex-1 min-w-0">
                 {isMobile && (
-                  <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
-                  </svg>
+                  <div className="relative">
+                    <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.418 8-9.883 8a9.864 9.864 0 01-4.601-1.139L3 21l2.139-3.516C4.381 16.275 4 14.193 4 12c0-4.418 4.477-8 10-8s10 3.582 10 8z" />
+                    </svg>
+                    {chat.isPinned && (
+                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    )}
+                  </div>
                 )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{chat.title}</p>
-                  {isMobile && <p className="text-xs text-gray-500">{chat.date}</p>}
-                  {!isMobile && <p className="text-xs text-gray-500 mt-1">{chat.date}</p>}
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                  {!isMobile && chat.isPinned && (
+                    <svg className="w-3 h-3 text-yellow-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+                    </svg>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>{chat.title}</p>
+                    {isMobile && <p className="text-xs text-gray-500">{chat.date}</p>}
+                    {!isMobile && <p className="text-xs text-gray-500 mt-1">{chat.date}</p>}
+                  </div>
                 </div>
               </div>
-              <button className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-gray-700 p-1 transition-all">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
+              <div className="flex items-center space-x-1">
+                {onTogglePin && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onTogglePin(chat.id)
+                    }}
+                    className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-yellow-500 p-1 transition-all"
+                    title={chat.isPinned ? "Unpin chat" : "Pin chat"}
+                  >
+                    <svg className="w-4 h-4" fill={chat.isPinned ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  </button>
+                )}
+                <button className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-gray-700 p-1 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -87,7 +126,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isPinned, setIsPinned] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const { getGroupedChatHistory } = useChat()
+  const { getGroupedChatHistory, togglePinChat } = useChat()
   const router = useRouter()
   const pathname = usePathname()
   const siteConfig = getSiteConfig()
@@ -102,6 +141,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
       const chatId = pathname.split('/chat/')[1]
       if (chatId) {
         const allChats = [
+          ...groupedChats.pinned,
           ...groupedChats.today,
           ...groupedChats.yesterday,
           ...groupedChats.previous7Days,
@@ -212,11 +252,12 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             {/* Chat History - Scrollable */}
             <div className="flex-1 overflow-y-auto min-h-0">
               <div className="px-4">
-                <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} isMobile={true} />
-                <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} isMobile={true} />
-                <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} isMobile={true} />
-                <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} isMobile={true} />
-                <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} isMobile={true} />
+                <ChatGroup title="Pinned" chats={groupedChats.pinned} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
+                <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
+                <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
+                <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
+                <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
+                <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} onTogglePin={togglePinChat} isMobile={true} />
               </div>
             </div>
 
@@ -317,11 +358,12 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {/* Chat History - Scrollable */}
         {!isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-4 modern-scrollbar">
-            <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} />
-            <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} />
-            <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} />
-            <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} />
-            <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} />
+            <ChatGroup title="Pinned" chats={groupedChats.pinned} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
+            <ChatGroup title="Today" chats={groupedChats.today} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
+            <ChatGroup title="Yesterday" chats={groupedChats.yesterday} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
+            <ChatGroup title="Previous 7 Days" chats={groupedChats.previous7Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
+            <ChatGroup title="Previous 30 Days" chats={groupedChats.previous30Days} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
+            <ChatGroup title="Older" chats={groupedChats.older} onChatClick={handleChatClick} onTogglePin={togglePinChat} />
           </div>
         )}
 
@@ -329,6 +371,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-2 py-4 my-2 no-scrollbar">
             <div className="space-y-2">
+              <ChatGroup title="" chats={groupedChats.pinned} onChatClick={handleChatClick} isCollapsed={true} />
               <ChatGroup title="" chats={groupedChats.today} onChatClick={handleChatClick} isCollapsed={true} />
               <ChatGroup title="" chats={groupedChats.yesterday} onChatClick={handleChatClick} isCollapsed={true} />
               <ChatGroup title="" chats={groupedChats.previous7Days} onChatClick={handleChatClick} isCollapsed={true} />
