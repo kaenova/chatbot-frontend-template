@@ -8,6 +8,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { useChat } from "@/contexts/ChatContext"
 import MenuButton from "./MenuButton"
 import Logo from "./Logo"
+import ChatSearch from "./ChatSearch"
 import { getSiteConfig } from "@/lib/site-config"
 import { SquarePen } from "lucide-react"
 
@@ -130,6 +131,9 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
               </button>
             </div>
 
+            {/* Search Field */}
+            <ChatSearch isMobile={true} onChatSelect={() => setIsMobileSidebarOpen(false)} />
+
             {/* Chat History - Scrollable */}
             <div className="flex-1 overflow-y-auto min-h-0">
               <div className="px-4">
@@ -214,7 +218,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
           }`}
         style={{ backgroundColor: 'var(--sidebar-bg)', color: 'var(--foreground)' }}
         onMouseEnter={() => setIsCollapsed(false)}
-        onMouseLeave={() => setIsCollapsed(true)}
+        onMouseLeave={() => setTimeout( () => {setIsCollapsed(true)}, 500) }
       >
         {/* Logo Section */}
         <div className="flex-shrink-0 p-4 border-b border-gray-300 space-y-5">
@@ -229,15 +233,17 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         <div className="flex-shrink-0 p-4">
           <button
             onClick={handleNewChat}
-            className={`w-full border border-gray-300 ${isCollapsed ? "py-2" : "py-2 px-4"} rounded-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors cursor-pointer`}
-            style={{ color: 'var(--foreground)' }}
+            className={`w-full ${isCollapsed ? "" : "border border-gray-300"}  ${isCollapsed ? "py-2" : "py-2 px-4"} rounded-full flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'} transition-colors cursor-pointer text-gray-400`}
             title={isCollapsed ? 'New Chat' : ''}
             type="button"
           >
-            <SquarePen size={isCollapsed ? 12 : 18} />
+            <SquarePen className={`${isCollapsed ? "w-4 h-4" : "w-5 h-5"}`}/>
             {!isCollapsed && <span>New Chat</span>}
           </button>
         </div>
+
+        {/* Search Field */}
+        <ChatSearch isCollapsed={isCollapsed} />
 
         {/* Chat History - Scrollable */}
         {!isCollapsed && (
