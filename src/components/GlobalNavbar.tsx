@@ -10,7 +10,7 @@ import MenuButton from "./MenuButton"
 import Logo from "./Logo"
 import ChatSearch from "./ChatSearch"
 import { getSiteConfig } from "@/lib/site-config"
-import { SquarePen } from "lucide-react"
+import { SquarePen, PanelRightClose, PanelRightOpen } from "lucide-react"
 
 interface GlobalNavbarProps {
   user: User
@@ -85,6 +85,7 @@ function ChatGroup({ title, chats, onChatClick, isCollapsed = false, isMobile = 
 
 export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isPinned, setIsPinned] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const { getGroupedChatHistory } = useChat()
   const router = useRouter()
@@ -272,15 +273,29 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         className={`hidden md:flex md:border-r border-gray-300 h-screen text-white flex-col transition-all duration-300 ease-in-out overflow-scroll overflow-x-clip no-scrollbar ${isCollapsed ? 'w-16' : 'w-80'
           }`}
         style={{ backgroundColor: 'var(--sidebar-bg)', color: 'var(--foreground)' }}
-        onMouseEnter={() => setIsCollapsed(false)}
-        onMouseLeave={() => setTimeout( () => {setIsCollapsed(true)}, 500) }
+        onMouseEnter={() => !isPinned && setIsCollapsed(false)}
+        onMouseLeave={() => !isPinned && setTimeout( () => {setIsCollapsed(true)}, 500) }
       >
         {/* Logo Section */}
         <div className="flex-shrink-0 p-4 space-y-5">
           <Logo showText={!isCollapsed} />
           {
             isCollapsed ? null :
-              <h1 className="font-bold text-left text-[var(--accent)]">{siteConfig.name}</h1>
+              <div className="flex items-center justify-between">
+                <h1 className="font-bold text-left text-[var(--accent)]">{siteConfig.name}</h1>
+                <button
+                  onClick={() => setIsPinned(!isPinned)}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                  title={isPinned ? 'Unpin sidebar' : 'Pin sidebar'}
+                  style={{ color: 'var(--foreground)' }}
+                >
+                  {isPinned ? (
+                    <PanelRightOpen className="w-4 h-4 text-gray-400" />
+                  ) : (
+                    <PanelRightClose className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
           }
         </div>
 
