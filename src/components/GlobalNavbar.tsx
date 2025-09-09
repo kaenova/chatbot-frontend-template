@@ -7,6 +7,8 @@ import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { useChat } from "@/contexts/ChatContext"
 import MenuButton from "./MenuButton"
+import Logo from "./Logo"
+import { getSiteConfig } from "@/lib/site-config"
 
 interface GlobalNavbarProps {
   user: User
@@ -18,6 +20,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const { chatHistory } = useChat()
   const router = useRouter()
   const pathname = usePathname()
+  const siteConfig = getSiteConfig()
 
   // Get mobile title based on current page
   const getMobileTitle = () => {
@@ -100,14 +103,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
           <div className="fixed inset-0 w-full text-white flex flex-col z-50 md:hidden transform transition-transform duration-300 ease-in-out translate-x-0 max-h-screen overflow-hidden" style={{ backgroundColor: 'var(--sidebar-bg)' }}>
             {/* Header with Close Button */}
             <div className="flex-shrink-0 p-4 border-b border-gray-300 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                </div>
-                <h1 className="text-xl font-semibold" style={{ color: 'var(--accent)' }}>ChatGPT Clone</h1>
-              </div>
+              <Logo showText={true} />
               <button
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
@@ -186,7 +182,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
                   ) : (
                     <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
                       <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                       </svg>
                     </div>
                   )}
@@ -214,23 +210,19 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden md:flex md:border-r border-gray-300 h-screen text-white flex-col transition-all duration-300 ease-in-out overflow-scroll overflow-x-clip no-scrollbar ${
-          isCollapsed ? 'w-16' : 'w-80'
-        }`}
+        className={`hidden md:flex md:border-r border-gray-300 h-screen text-white flex-col transition-all duration-300 ease-in-out overflow-scroll overflow-x-clip no-scrollbar ${isCollapsed ? 'w-16' : 'w-80'
+          }`}
         style={{ backgroundColor: 'var(--sidebar-bg)', color: 'var(--foreground)' }}
         onMouseEnter={() => setIsCollapsed(false)}
         onMouseLeave={() => setIsCollapsed(true)}
       >
         {/* Logo Section */}
-        <div className="flex-shrink-0 p-4 border-b border-gray-300">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-            </div>
-            {!isCollapsed && <h1 className="text-xl font-semibold" style={{ color: 'var(--accent)' }}>ChatGPT Clone</h1>}
-          </div>
+        <div className="flex-shrink-0 p-4 border-b border-gray-300 space-y-5">
+          <Logo showText={!isCollapsed} />
+          {
+            isCollapsed ? null :
+              <h1 className="font-bold text-center text-[var(--accent)]">{siteConfig.name}</h1>
+          }
         </div>
 
         {/* New Chat Button */}

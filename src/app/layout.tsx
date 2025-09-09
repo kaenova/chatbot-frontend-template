@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers"
+import { getSiteConfig } from "@/lib/site-config"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +14,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteConfig = getSiteConfig()
+
 export const metadata: Metadata = {
-  title: "ChatGPT Clone",
-  description: "A ChatGPT-like interface built with Next.js and NextAuth",
+  title: siteConfig.title,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({

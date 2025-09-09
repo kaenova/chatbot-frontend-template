@@ -3,6 +3,8 @@
 import { signIn } from "next-auth/react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Logo from "@/components/Logo"
+import { getSiteConfig } from "@/lib/site-config"
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false)
@@ -10,6 +12,7 @@ export default function SignIn() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
+  const siteConfig = getSiteConfig()
 
   const handleCredentialsSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,13 +54,11 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'var(--background)' }}>
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
-            <svg className="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
+          <div className="mx-auto">
+            <Logo className="justify-center" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--accent)' }}>
-            Welcome to ChatGPT Clone
+            Welcome to {siteConfig.title}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Sign in to continue to your conversations
