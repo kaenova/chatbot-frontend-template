@@ -108,7 +108,7 @@ Set the environment variable in your frontend:
 
 ```bash
 # In your frontend .env.local
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+BACKEND_URL=http://localhost:8000
 ```
 
 ## Development

@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
-import { apiClient } from '@/lib/api-client'
+import { formatRelativeTime } from '@/lib/date-utils'
 
 interface ChatItem {
   id: string
@@ -14,8 +14,8 @@ interface ChatItem {
 interface ConversationApiResponse {
   id: string
   title: string
-  createdAt: number
-  isPinned: boolean
+  created_at: number
+  is_pinned: boolean
 }
 
 interface ChatContextType {
@@ -99,115 +99,117 @@ interface ChatProviderProps {
   children: ReactNode
 }
 
-export function ChatProvider({ children }: ChatProviderProps) {
-  const now = new Date()
-  const [chatHistory, setChatHistory] = useState<ChatItem[]>([
+const now = new Date()
+const MockChatHistory: ChatItem[] = [
     {
       id: '1',
       title: 'How to build a web application',
-      date: '2 hours ago',
+      date: formatRelativeTime(now.getTime() - 2 * 60 * 60 * 1000),
       createdAt: now.getTime() - 2 * 60 * 60 * 1000, // 2 hours ago
       isPinned: true
     },
     {
       id: '2',
       title: 'React best practices',
-      date: '1 day ago',
+      date: formatRelativeTime(now.getTime() - 1 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 1 * 24 * 60 * 60 * 1000, // 1 day ago
       isPinned: false
     },
     {
       id: '3',
       title: 'TypeScript basics',
-      date: '3 days ago',
+      date: formatRelativeTime(now.getTime() - 3 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 3 * 24 * 60 * 60 * 1000, // 3 days ago
       isPinned: true
     },
     {
       id: '4',
       title: 'Next.js routing',
-      date: '1 week ago',
+      date: formatRelativeTime(now.getTime() - 7 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 7 * 24 * 60 * 60 * 1000, // 1 week ago
       isPinned: false
     },
     {
       id: '5',
       title: 'CSS Grid vs Flexbox',
-      date: '2 weeks ago',
+      date: formatRelativeTime(now.getTime() - 14 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 14 * 24 * 60 * 60 * 1000, // 2 weeks ago
       isPinned: false
     },
     {
       id: '6',
       title: 'Database design principles',
-      date: '3 weeks ago',
+      date: formatRelativeTime(now.getTime() - 21 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 21 * 24 * 60 * 60 * 1000, // 3 weeks ago
       isPinned: false
     },
     {
       id: '7',
       title: 'API authentication methods',
-      date: '1 month ago',
+      date: formatRelativeTime(now.getTime() - 30 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 30 * 24 * 60 * 60 * 1000, // 1 month ago
       isPinned: false
     },
     {
       id: '8',
       title: 'Performance optimization techniques',
-      date: '1 month ago',
+      date: formatRelativeTime(now.getTime() - 35 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 35 * 24 * 60 * 60 * 1000, // 35 days ago
       isPinned: false
     },
     {
       id: '9',
       title: 'Testing strategies for React apps',
-      date: '2 months ago',
+      date: formatRelativeTime(now.getTime() - 60 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 60 * 24 * 60 * 60 * 1000, // 2 months ago
       isPinned: false
     },
     {
       id: '10',
       title: 'Deployment best practices',
-      date: '2 months ago',
+      date: formatRelativeTime(now.getTime() - 65 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 65 * 24 * 60 * 60 * 1000, // 65 days ago
       isPinned: false
     },
     {
       id: '11',
       title: 'State management solutions',
-      date: '3 months ago',
+      date: formatRelativeTime(now.getTime() - 90 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 90 * 24 * 60 * 60 * 1000, // 3 months ago
       isPinned: false
     },
     {
       id: '12',
       title: 'Component design patterns',
-      date: '3 months ago',
+      date: formatRelativeTime(now.getTime() - 95 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 95 * 24 * 60 * 60 * 1000, // 95 days ago
       isPinned: false
     },
     {
       id: '13',
       title: 'Error handling in JavaScript',
-      date: '4 months ago',
+      date: formatRelativeTime(now.getTime() - 120 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 120 * 24 * 60 * 60 * 1000, // 4 months ago
       isPinned: false
     },
     {
       id: '14',
       title: 'Web security fundamentals',
-      date: '4 months ago',
+      date: formatRelativeTime(now.getTime() - 125 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 125 * 24 * 60 * 60 * 1000, // 125 days ago
       isPinned: false
     },
     {
       id: '15',
       title: 'Progressive Web Apps',
-      date: '5 months ago',
+      date: formatRelativeTime(now.getTime() - 150 * 24 * 60 * 60 * 1000),
       createdAt: now.getTime() - 150 * 24 * 60 * 60 * 1000, // 5 months ago
       isPinned: false
     },
-  ])
+  ]
+
+export function ChatProvider({ children }: ChatProviderProps) {
+  const [chatHistory, setChatHistory] = useState<ChatItem[]>([])
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -215,20 +217,32 @@ export function ChatProvider({ children }: ChatProviderProps) {
   // Load conversations on mount
   useEffect(() => {
     loadConversations()
+    const autoUpdate = setInterval(() => {
+      loadConversations()
+    }, 20 * 1000); // Refresh every 20 seconds
+    
+
+    return () => {
+      clearInterval(autoUpdate)
+    }
+
   }, [])
 
   const loadConversations = async () => {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await apiClient.get('/conversations')
-      const data = response.data as ConversationApiResponse[]
+      const response = await fetch('/api/conversations')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.json() as ConversationApiResponse[]
       const conversations = data.map((conv) => ({
         id: conv.id,
         title: conv.title,
-        date: new Date(conv.createdAt).toLocaleDateString(),
-        createdAt: conv.createdAt,
-        isPinned: conv.isPinned
+        date: formatRelativeTime(conv.created_at),
+        createdAt: conv.created_at,
+        isPinned: conv.is_pinned
       }))
       setChatHistory(conversations)
     } catch (err) {
@@ -242,7 +256,12 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const togglePinChat = async (chatId: string) => {
     try {
       setError(null)
-      await apiClient.put(`/conversations/${chatId}/pin`)
+      const response = await fetch(`/api/conversations/${chatId}/pin`, {
+        method: 'PUT',
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       // Update local state optimistically
       setChatHistory(prevHistory =>
         prevHistory.map(chat =>
@@ -260,7 +279,12 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const deleteChat = async (chatId: string) => {
     try {
       setError(null)
-      await apiClient.delete(`/conversations/${chatId}`)
+      const response = await fetch(`/api/conversations/${chatId}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       // Update local state optimistically
       setChatHistory(prevHistory =>
         prevHistory.filter(chat => chat.id !== chatId)

@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/auth'
+import { getToken } from 'next-auth/jwt'
+import { getBackendUrl, getBackendAuthHeaders } from '@/lib/backend-auth'
+
+const secret = process.env.NEXTAUTH_SECRET
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const token = await getToken({ req: request, secret })
 
-    if (!session?.accessToken) {
+    if (!token?.userId) {
       return NextResponse.json(
         { error: 'Unauthorized', code: 'UNAUTHORIZED' },
         { status: 401 }
@@ -21,8 +23,11 @@ export async function GET(
     const lastTimestamp = searchParams.get('last_timestamp')
     const limit = searchParams.get('limit')
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+    const backendUrl = getBackendUrl()
     const queryParams = new URLSearchParams()
+
+    // Add user_id to query params
+    queryParams.append('user_id', token.userId)
 
     if (lastTimestamp) {
       queryParams.append('last_timestamp', lastTimestamp)
@@ -33,13 +38,11 @@ export async function GET(
     }
 
     const queryString = queryParams.toString()
-    const url = `${backendUrl}/conversations/${conversationId}/chats${queryString ? `?${queryString}` : ''}`
+    const url = `${backendUrl}/conversations/${conversationId}/chats?${queryString}`
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${session.accessToken}`,
-      },
+      headers: getBackendAuthHeaders(),
     })
 
     if (!response.ok) {

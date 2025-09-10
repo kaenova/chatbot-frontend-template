@@ -216,26 +216,6 @@ curl -X GET "http://localhost:8000/conversations/conv-123/chats?user_id=123&limi
 - Error handling for authentication failures
 - Support for streaming responses
 
-### Usage Example
-
-```typescript
-import { apiClient } from '@/lib/api-client'
-
-// Chat inference with streaming
-const response = await apiClient.post('/chat/inference', {
-  conversation_id: 'conv-123',
-  message: 'Hello'
-}, {
-  responseType: 'stream'
-})
-
-// Get conversations
-const conversations = await apiClient.get('/conversations')
-
-// Pin conversation
-const updated = await apiClient.put('/conversations/conv-123/pin')
-```
-
 ## Error Handling
 
 All endpoints return standardized error responses:

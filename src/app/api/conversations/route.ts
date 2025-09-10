@@ -1,25 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/auth'
+import { getToken } from 'next-auth/jwt'
+import { getBackendUrl, getBackendAuthHeaders } from '@/lib/backend-auth'
 
-export async function GET() {
+const secret = process.env.NEXTAUTH_SECRET
+
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const token = await getToken({ req: request, secret})
 
-    if (!session?.accessToken) {
+    if (!token?.userId) {
       return NextResponse.json(
         { error: 'Unauthorized', code: 'UNAUTHORIZED' },
         { status: 401 }
       )
     }
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+    const backendUrl = getBackendUrl()
+    const userId = token.userId
 
-    const response = await fetch(`${backendUrl}/conversations`, {
+    const response = await fetch(`${backendUrl}/conversations?user_id=${userId}`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${session.accessToken}`,
-      },
+      headers: getBackendAuthHeaders(),
     })
 
     if (!response.ok) {

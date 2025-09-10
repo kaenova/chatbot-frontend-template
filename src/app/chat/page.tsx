@@ -7,7 +7,6 @@ import AssistantMessage from '@/components/AssistantMessage'
 import LoadingMessage from '@/components/LoadingMessage'
 import ChatInput from '@/components/ChatInput'
 import { siteConfig } from '@/lib/site-config'
-import { apiClient } from '@/lib/api-client'
 
 // Re-define Message interface here or import from a shared type file if available
 interface Message {
@@ -76,35 +75,54 @@ export default function ChatPage() {
     try {
       let conversationId: string | undefined
 
-      await apiClient.postStream(
-        '/chat/inference',
-        { message: userMessage.content },
-        (chunk: string) => {
-          // Handle streaming chunks
-          if (chunk.startsWith('convid:')) {
-            conversationId = chunk.substring(7) // Remove 'convid:' prefix
-          } else if (chunk.startsWith('c:')) {
-            const contentChunk = chunk.substring(2) // Remove 'c:' prefix
-            setMessages(prev =>
-              prev.map(msg =>
-                msg.id === assistantMessageId
-                  ? { ...msg, content: msg.content + contentChunk }
-                  : msg
-              )
-            )
-          }
+      const response = await fetch('/api/chat/inference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        (error) => {
-          console.error('Streaming error:', error)
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === assistantMessageId
-                ? { ...msg, content: 'Sorry, there was an error processing your request.' }
-                : msg
-            )
-          )
+        body: JSON.stringify({
+          message: userMessage.content,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No response stream')
+      }
+
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (line.trim()) {
+            // Handle streaming chunks
+            if (line.startsWith('convid:')) {
+              conversationId = line.substring(7) // Remove 'convid:' prefix
+            } else if (line.startsWith('c:')) {
+              const contentChunk = line.substring(2) // Remove 'c:' prefix
+              setMessages(prev =>
+                prev.map(msg =>
+                  msg.id === assistantMessageId
+                    ? { ...msg, content: msg.content + contentChunk }
+                    : msg
+                )
+              )
+            }
+          }
         }
-      )
+      }
     } catch (error) {
       console.error('Chat inference error:', error)
       setMessages(prev =>

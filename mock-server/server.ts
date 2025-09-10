@@ -1,18 +1,9 @@
-import db, { statements, generateId, getCurrentTimestamp } from './db'
+import { statements, generateId, getCurrentTimestamp } from './db'
 import { generateMockMarkdown, generateConversationTitle } from './mock-responses'
-import jwt from 'jsonwebtoken'
 
 const PORT = process.env.PORT || 8000
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'development-secret-key'
-
-// Types
-interface Conversation {
-  id: string
-  title: string
-  created_at: number
-  updated_at: number
-  is_pinned: number
-}
+const BasicAuthUsername = 'apiuser'
+const BasicAuthPassword = 'securepass123'
 
 // Helper function to parse JSON body
 async function parseJsonBody(request: Request): Promise<unknown> {
@@ -60,16 +51,6 @@ function errorResponse(message: string, status = 500): Response {
   return jsonResponse({ error: message, code: 'ERROR' }, status)
 }
 
-// JWT payload interface
-interface JWTPayload {
-  id?: string
-  email?: string
-  name?: string
-  accessToken?: string
-  iat?: number
-  exp?: number
-}
-
 // Basic Auth validation helper
 function validateBasicAuth(request: Request): { valid: boolean; user?: string; error?: string } {
   try {
@@ -83,7 +64,7 @@ function validateBasicAuth(request: Request): { valid: boolean; user?: string; e
     const [username, password] = credentials.split(':')
 
     // Validate credentials
-    if (username === 'apiuser' && password === 'securepass123') {
+    if (username === BasicAuthUsername && password === BasicAuthPassword) {
       return { valid: true, user: username }
     }
 

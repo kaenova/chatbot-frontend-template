@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/auth'
+import { getToken } from 'next-auth/jwt'
+import { getBackendUrl, getBackendAuthHeaders } from '@/lib/backend-auth'
+
+const secret = process.env.NEXTAUTH_SECRET
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const token = await getToken({ req: request, secret })
 
-    if (!session?.accessToken) {
+    if (!token?.userId) {
       return NextResponse.json(
         { error: 'Unauthorized', code: 'UNAUTHORIZED' },
         { status: 401 }
@@ -23,15 +25,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+    const backendUrl = getBackendUrl()
+    const userId = token.userId
 
     // Forward to backend
-    const backendResponse = await fetch(`${backendUrl}/chat/inference`, {
+    const backendResponse = await fetch(`${backendUrl}/chat/inference?user_id=${userId}`, {
       method: 'POST',
-      headers: {
+      headers: getBackendAuthHeaders({
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.accessToken}`,
-      },
+      }),
       body: JSON.stringify({
         conversation_id: conversation_id || null,
         message,

@@ -16,11 +16,17 @@ A ChatGPT-like frontend application built with Next.js, TypeScript, TailwindCSS,
 
 This frontend is designed to work with a custom inferencing backend. The Next.js application acts as a proxy between the browser and your backend API.
 
+### Authentication Setup
+
+**Important:** Backend API authentication credentials must be configured using environment variables. See [`docs/backend-authentication.md`](docs/backend-authentication.md) for detailed setup instructions.
+
 ### Quick Start for Backend Developers
 
-1. **Set Environment Variable:**
+1. **Set Environment Variables:**
    ```env
-   NEXT_PUBLIC_BACKEND_URL=https://your-backend-api.com
+   BACKEND_URL=https://your-backend-api.com
+   BACKEND_API_USERNAME=your-api-username
+   BACKEND_API_PASSWORD=your-api-password
    ```
 
 2. **Implement Required Endpoints:**
@@ -91,7 +97,11 @@ See [`docs/api-draft.md`](docs/api-draft.md) for complete API specifications, re
    MOCK_AUTH=false
 
    # Backend Integration
-   NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+   BACKEND_URL=http://localhost:8000
+   
+   # Backend API Authentication
+   BACKEND_API_USERNAME=apiuser
+   BACKEND_API_PASSWORD=securepass123
 
    # Optional: Google OAuth (for real authentication)
    # GOOGLE_CLIENT_ID=your-google-client-id
@@ -240,9 +250,9 @@ The mock server provides:
 ### Environment Variables
 
 ```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000  # Mock backend URL
+BACKEND_URL=http://localhost:8000  # Mock backend URL
 # Or your production backend URL
-NEXT_PUBLIC_BACKEND_URL=https://your-api.com
+BACKEND_URL=https://your-api.com
 ```
 
 ## Technologies Used
