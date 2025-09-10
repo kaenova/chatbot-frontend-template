@@ -1,4 +1,3 @@
-import { shouldUseMockAuth } from './dev-config'
 import { getAuthSession } from '@/auth'
 
 // Mock session for development
@@ -16,11 +15,5 @@ export const mockSession = {
 
 // Function to get session (real or mock)
 export async function getSessionOrMock() {
-  if (shouldUseMockAuth()) {
-    console.log('[MOCK AUTH] Using mock session for development')
-    return mockSession
-  }
-  
-  console.log('[REAL AUTH] Using NextAuth')
   return await getAuthSession()
 }

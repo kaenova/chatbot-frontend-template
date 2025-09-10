@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
-import { shouldUseMockAuth } from "@/lib/dev-config"
 
 export async function middleware(request: NextRequest) {
-  // If using mock auth, bypass all middleware checks
-  if (shouldUseMockAuth()) {
-    console.log('[MIDDLEWARE MOCK] Bypassing auth check for:', request.nextUrl.pathname)
-    return NextResponse.next()
-  }
 
-  // Otherwise, use real NextAuth middleware
-  console.log('[MIDDLEWARE REAL] Using NextAuth middleware for:', request.nextUrl.pathname)
-  
   const token = await getToken({ 
     req: request, 
     secret: process.env.NEXTAUTH_SECRET 

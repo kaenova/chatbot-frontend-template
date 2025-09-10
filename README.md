@@ -250,9 +250,25 @@ The mock server provides:
 ### Environment Variables
 
 ```env
-BACKEND_URL=http://localhost:8000  # Mock backend URL
-# Or your production backend URL
-BACKEND_URL=https://your-api.com
+# =============================================================================
+# API CONFIGURATION
+# =============================================================================
+
+# Backend URL for server-side API calls
+BACKEND_URL=http://localhost:8000
+
+# Backend API Authentication
+# Basic auth credentials for backend API access
+BACKEND_API_USERNAME=apiuser
+BACKEND_API_PASSWORD=securepass123
+
+# =============================================================================
+# AUTHENTICATION CONFIGURATION
+# =============================================================================
+
+# NextAuth Configuration
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key-here
 ```
 
 ## Technologies Used
@@ -267,10 +283,9 @@ BACKEND_URL=https://your-api.com
 
 ## Production Deployment
 
-1. Set `MOCK_AUTH=false` in your production environment
-2. Configure proper Google OAuth credentials
-3. Set a secure `NEXTAUTH_SECRET`
-4. Deploy to your preferred platform (Vercel, Netlify, etc.)
+1. Set a secure `NEXTAUTH_SECRET`
+2. Set your backend endpoint and credential `BACKEND_URL`, `BACKEND_API_USERNAME`, `BACKEND_API_PASSWORD`
+3. Deploy to your preferred platform (Vercel, Netlify, etc.)
 
 ## Contributing
 
