@@ -7,6 +7,7 @@ import AssistantMessage from '@/components/AssistantMessage'
 import LoadingMessage from '@/components/LoadingMessage'
 import ChatInput from '@/components/ChatInput'
 import { siteConfig } from '@/lib/site-config'
+import { decodeBase64 } from '@/lib/chat-utils'
 
 // Re-define Message interface here or import from a shared type file if available
 interface Message {
@@ -15,6 +16,7 @@ interface Message {
   content: string
   timestamp: number // epoch milliseconds
 }
+
 
 export default function ChatPage() {
   const { data: session } = useSession()
@@ -112,10 +114,11 @@ export default function ChatPage() {
               conversationId = line.substring(7) // Remove 'convid:' prefix
             } else if (line.startsWith('c:')) {
               const contentChunk = line.substring(2) // Remove 'c:' prefix
+              const decodedChunk = decodeBase64(contentChunk)
               setMessages(prev =>
                 prev.map(msg =>
                   msg.id === assistantMessageId
-                    ? { ...msg, content: msg.content + contentChunk }
+                    ? { ...msg, content: msg.content + decodedChunk }
                     : msg
                 )
               )
@@ -138,15 +141,15 @@ export default function ChatPage() {
   }
 
 
-  useEffect(() => {
-    const messageContainer = document.getElementById('main-message')
-    if (messageContainer) {
-      messageContainer.scrollTo({
-        top: messageContainer.scrollHeight,
-        behavior: 'smooth'
-      })
-    }
-  }, [messages])
+  // useEffect(() => {
+  //   const messageContainer = document.getElementById('main-message')
+  //   if (messageContainer) {
+  //     // messageContainer.scrollTo({
+  //     //   top: messageContainer.scrollHeight,
+  //     //   behavior: 'smooth'
+  //     // })
+  //   }
+  // }, [messages])
 
   return (
     <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden" style={{ backgroundColor: 'var(--background)' }}>

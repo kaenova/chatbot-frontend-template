@@ -85,9 +85,55 @@ curl -X POST "http://localhost:8000/chat/inference?user_id=123" \
 ```
 
 **Response:** Streaming response with encoded format
-- Always sends `convid:[conversationId]` first (whether new or existing conversation)
-- Then sends streaming chunks as `c:[chunktext]`
+- Always sends `convid:[conversationId]` first (whether new or existing conversation) with an ending of new line (`\n`)
+- Then sends streaming chunks as `c:[base64(chunktext)]` with an ending of new line (`\n`)
+- **Base64 Encoding**: Text chunks must be encoded using UTF-8 compatible base64 encoding that handles Unicode characters properly
+- Example:
+  ```
+  convid:generated-conversation-id
+  c:SGVsbG8hIA==
+  c:SSdtIGRvaW5nIGdyZWF0IQ==
+  c:VGhhbmsgeW91IGZvciBhc2tpbmch
+  c:IA==
+  c:VGhpcyBpcyBhIHJpY2hseSBtYXJrZG93bi4=
+  c:IA==
+  c:SG93IGNhbiBJIGhlbHAgbW9yZSB0b2RheT8=
+  ```
 - Format: Server-Sent Events or plain text stream with prefixed messages
+
+**Base64 Encoding Implementation:**
+
+*TypeScript/JavaScript:*
+```typescript
+function toBase64(str: string): string {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+```
+
+*Python:*
+```python
+import base64
+
+def to_base64(text: str) -> str:
+    """
+    Encode text to base64 with proper UTF-8 handling
+    """
+    return base64.b64encode(text.encode('utf-8')).decode('ascii')
+
+# Example usage
+chunk = "Hello! "
+encoded = to_base64(chunk)
+stream_data = f"c:{encoded}\n"
+```
+
+Stream Example:
+```
+convid:generated-conversation-id
+c:SGVsbG8hIA==
+c:SSdtIGRvaW5nIGdyZWF0IQ==
+c:VGhhbmsgeW91IGZvciBhc2tpbmch
+c:IA==
+```
 
 **Backend Proxy:** Forwards to custom backend's chat inference endpoint with Basic Auth and user_id.
 

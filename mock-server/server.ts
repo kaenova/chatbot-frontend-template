@@ -5,6 +5,12 @@ const PORT = process.env.PORT || 8000
 const BasicAuthUsername = 'apiuser'
 const BasicAuthPassword = 'securepass123'
 
+// Encode
+
+function toBase64(str: string): string {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
 // Helper function to parse JSON body
 async function parseJsonBody(request: Request): Promise<unknown> {
   try {
@@ -212,10 +218,12 @@ async function handleRequest(request: Request): Promise<Response> {
 
           const sendChunk = () => {
             if (index < chunks.length) {
-              const chunk = chunks[index]
-              controller.enqueue(`c:${chunk} `)
+              const chunk = chunks[index] + " " // Add space back from mock split
+              console.log("Before encoding chunk:", chunk)
+              const data = `c:${toBase64(chunk)}\n`
+              console.log('Sending chunk:', data)
+              controller.enqueue(data)
               index++
-
               // Simulate typing delay
               setTimeout(sendChunk, Math.random() * 50 + 10)
             } else {

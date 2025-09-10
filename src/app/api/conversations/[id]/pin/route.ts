@@ -6,7 +6,7 @@ const secret = process.env.NEXTAUTH_SECRET
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = await getToken({ req: request, secret })
@@ -18,7 +18,7 @@ export async function PUT(
       )
     }
 
-    const conversationId = params.id
+    const conversationId = (await params).id
     const backendUrl = getBackendUrl()
     const userId = token.userId
 

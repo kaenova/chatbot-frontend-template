@@ -6,7 +6,7 @@ const secret = process.env.NEXTAUTH_SECRET
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = await getToken({ req: request, secret })
@@ -18,7 +18,7 @@ export async function GET(
       )
     }
 
-    const conversationId = params.id
+    const conversationId = (await params).id
     const { searchParams } = new URL(request.url)
     const lastTimestamp = searchParams.get('last_timestamp')
     const limit = searchParams.get('limit')
