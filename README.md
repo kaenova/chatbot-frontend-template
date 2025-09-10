@@ -10,6 +10,40 @@ A ChatGPT-like frontend application built with Next.js, TypeScript, TailwindCSS,
 - 🎨 Responsive design with TailwindCSS
 - 🚀 Built with Next.js App Router
 - 🔧 TypeScript for type safety
+- 🔗 Backend API Integration Ready
+
+## Backend API Integration
+
+This frontend is designed to work with a custom inferencing backend. The Next.js application acts as a proxy between the browser and your backend API.
+
+### Quick Start for Backend Developers
+
+1. **Set Environment Variable:**
+   ```env
+   NEXT_PUBLIC_BACKEND_URL=https://your-backend-api.com
+   ```
+
+2. **Implement Required Endpoints:**
+   Your backend must provide these endpoints with JWT authentication:
+
+   - `POST /chat/inference` - Chat inference with streaming
+   - `GET /conversations` - List conversations
+   - `PUT /conversations/{id}/pin` - Pin/unpin conversation
+   - `DELETE /conversations/{id}` - Delete conversation
+   - `GET /conversations/{id}/chats` - Get chat history
+
+3. **Authentication:**
+   - All requests include `Authorization: Bearer <jwt>` header
+   - JWT is obtained from NextAuth session
+   - Backend should validate JWT as per your authentication system
+
+4. **Streaming Response:**
+   - Chat inference uses streaming with prefixed messages
+   - Format: `convid:[id]` followed by `c:[chunk]` for each text chunk
+
+### Detailed API Documentation
+
+See [`docs/api-draft.md`](docs/api-draft.md) for complete API specifications, request/response schemas, and integration examples.
 
 ## Development Setup
 
