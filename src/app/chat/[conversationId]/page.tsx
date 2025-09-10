@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import UserMessage from '@/components/UserMessage'
 import AssistantMessage from '@/components/AssistantMessage'
@@ -16,6 +16,49 @@ interface Message {
   timestamp: number // epoch milliseconds
 }
 
+// Memoized component to prevent re-rendering of messages when streaming content changes
+const MessagesList = React.memo(({ messages }: { messages: Message[] }) => {
+  return (
+    <>
+      {messages.map((message) => (
+        <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          {message.role === 'assistant' ? (
+            <AssistantMessage message={message} />
+          ) : (
+            <UserMessage message={message} />
+          )}
+        </div>
+      ))}
+    </>
+  )
+})
+
+MessagesList.displayName = 'MessagesList'
+
+// Memoized component for streaming message to avoid unnecessary re-renders
+const StreamingMessage = React.memo(({
+  streamingMessage
+}: {
+  streamingMessage: { id: string; content: string } | null;
+}) => {
+  if (!streamingMessage) return null;
+
+  return (
+    <div className="flex justify-start mb-40">
+      <AssistantMessage
+        message={{
+          id: streamingMessage.id,
+          role: 'assistant',
+          content: streamingMessage.content,
+          timestamp: Date.now()
+        }}
+      />
+    </div>
+  );
+})
+
+StreamingMessage.displayName = 'StreamingMessage'
+
 export default function ConversationPage() {
   const params = useParams()
   const router = useRouter()
@@ -25,6 +68,12 @@ export default function ConversationPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Separate state for streaming content to avoid re-rendering all messages
+  const [streamingMessage, setStreamingMessage] = useState<{
+    id: string
+    content: string
+  } | null>(null)
 
   // Auto-scroll to bottom when component mounted
   useEffect(() => {
@@ -87,17 +136,21 @@ export default function ConversationPage() {
     setMessages(prev => [...prev, userMessage])
     setIsLoading(true)
 
-    // Create assistant message placeholder
-    const assistantMessageId = (Date.now() + 1).toString()
-    const assistantMessage: Message = {
-      id: assistantMessageId,
-      conversation_id: conversationId,
-      role: 'assistant',
-      content: '',
-      timestamp: Date.now()
+    // After streaming is complete, scroll to the bottom
+    const messageContainer = document.getElementById('main-message')
+    if (messageContainer) {
+      messageContainer.scrollTo({
+        top: messageContainer.scrollHeight,
+        behavior: 'smooth'
+      })
     }
 
-    setMessages(prev => [...prev, assistantMessage])
+    // Create assistant message placeholder and set up streaming state
+    const assistantMessageId = (Date.now() + 1).toString()
+    setStreamingMessage({
+      id: assistantMessageId,
+      content: ''
+    })
 
     try {
       const response = await fetch('/api/chat/inference', {
@@ -123,6 +176,7 @@ export default function ConversationPage() {
       const decoder = new TextDecoder()
       let buffer = ''
       let receivedConversationId: string | undefined
+      let accumulatedContent = ''
 
       while (true) {
         const { done, value } = await reader.read()
@@ -145,17 +199,29 @@ export default function ConversationPage() {
             } else if (line.startsWith('c:')) {
               const contentChunk = line.substring(2) // Remove 'c:' prefix
               const decodedChunk = decodeBase64(contentChunk)
-              setMessages(prev =>
-                prev.map(msg =>
-                  msg.id === assistantMessageId
-                    ? { ...msg, content: msg.content + decodedChunk }
-                    : msg
-                )
-              )
+              accumulatedContent += decodedChunk
+
+              // Update streaming message state instead of all messages
+              setStreamingMessage(prev => prev ? {
+                ...prev,
+                content: accumulatedContent
+              } : null)
             }
           }
         }
       }
+
+      // After streaming is complete, add the final message to messages and clear streaming state
+      const finalAssistantMessage: Message = {
+        id: assistantMessageId,
+        conversation_id: conversationId,
+        role: 'assistant',
+        content: accumulatedContent,
+        timestamp: Date.now()
+      }
+
+      setMessages(prev => [...prev, finalAssistantMessage])
+      setStreamingMessage(null)
 
       // After streaming is complete, scroll to the bottom
       const messageContainer = document.getElementById('main-message')
@@ -167,13 +233,18 @@ export default function ConversationPage() {
       }
     } catch (error) {
       console.error('Chat inference error:', error)
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === assistantMessageId
-            ? { ...msg, content: 'Sorry, there was an error processing your request.' }
-            : msg
-        )
-      )
+
+      // Add error message and clear streaming state
+      const errorMessage: Message = {
+        id: streamingMessage?.id || (Date.now() + 1).toString(),
+        conversation_id: conversationId,
+        role: 'assistant',
+        content: 'Sorry, there was an error processing your request.',
+        timestamp: Date.now()
+      }
+
+      setMessages(prev => [...prev, errorMessage])
+      setStreamingMessage(null)
     } finally {
       setIsLoading(false)
     }
@@ -235,17 +306,12 @@ export default function ConversationPage() {
               </div>
             </div>
           ) : (
-            messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {message.role === 'assistant' ? (
-                  <AssistantMessage message={message} />
-                ) : (
-                  <UserMessage message={message} />
-                )}
-              </div>
-            ))
+            <>
+              <MessagesList messages={messages} />
+              <StreamingMessage streamingMessage={streamingMessage} />
+            </>
           )}
-          {isLoading && <LoadingMessage />}
+          {isLoading && !streamingMessage && <LoadingMessage />}
         </div>
       </div>
 
