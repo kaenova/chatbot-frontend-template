@@ -22,7 +22,7 @@ const MessagesList = React.memo(({ messages }: { messages: Message[] }) => {
   return (
     <>
       {messages.map((message) => (
-        <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+        <div key={message.id} className={`${message.role === 'user' ? 'justify-end' : 'justify-start'} max-w-screen flex px-2 md:p-0 overflow-clip`}>
           {message.role === 'assistant' ? (
             <AssistantMessage message={message} />
           ) : (
@@ -380,7 +380,7 @@ export default function ConversationPage() {
   return (
     <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden" style={{ backgroundColor: 'var(--background)' }}>
       {/* Chat Messages - Full Height */}
-      <div id="main-message" className="flex-1 overflow-y-auto p-6 pb-32 scroll-smooth no-scrollbar md:pt-6 pt-20">
+      <div id="main-message" className="flex-1 overflow-y-auto md:p-6 pb-32 scroll-smooth no-scrollbar md:pt-6 pt-20">
         <div className="max-w-4xl mx-auto space-y-6">
           {messages.length === 0 ? (
             // Empty conversation state

@@ -95,7 +95,8 @@ export default function MarkdownContent({ content, className = '' }: MarkdownCon
       </h6>
     ),
     ul: ({ children }) => <ul className="list-disc ml-4">{children}</ul>,
-    li: ({ children }) => <li className="mb-1">{children}</li>
+    li: ({ children }) => <li className="mb-1">{children}</li>,
+    hr: () => <hr className="my-4 border-gray-300 w-min" />,
   }
 
   return (

@@ -27,7 +27,7 @@ export default function AssistantMessage({ message, showIcon = false }: Assistan
       )}
       <div className="flex-1">
         <div className="max-w-full" style={{ color: 'var(--foreground)' }}>
-          <MarkdownContent content={message.content} />
+          <MarkdownContent content={message.content} className='max-w-screen' />
         </div>
         <div className="text-xs text-gray-500 mt-1 text-left">
           {new Date(message.timestamp).toLocaleTimeString()}
