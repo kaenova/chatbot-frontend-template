@@ -7,7 +7,6 @@ import AssistantMessage from '@/components/AssistantMessage'
 import LoadingMessage from '@/components/LoadingMessage'
 import ChatInput from '@/components/ChatInput'
 import { decodeBase64 } from '@/lib/chat-utils'
-import { useChatInput } from '@/contexts/ChatInputContext'
 
 interface Message {
   id: string
@@ -21,9 +20,9 @@ export default function ConversationPage() {
   const params = useParams()
   const router = useRouter()
   const conversationId = params.conversationId as string
-  const { setIsLoading, isLoading } = useChatInput()
 
   const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -253,6 +252,7 @@ export default function ConversationPage() {
       {/* Floating Input */}
       <ChatInput
         handleSubmit={handleSubmit}
+        isLoading={isLoading}
       />
     </div>
   )

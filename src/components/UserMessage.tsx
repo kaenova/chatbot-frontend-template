@@ -20,7 +20,7 @@ export default function UserMessage({ message, showIcon = false }: UserMessagePr
         <div className="text-white px-4 py-2 rounded-lg max-w-md" style={{ backgroundColor: 'var(--accent)' }}>
           <MarkdownContent
             content={message.content}
-            className="!text-white prose-invert prose-p:m-0 prose-p:text-white prose-headings:text-white prose-strong:text-white prose-code:text-gray-200 prose-a:text-gray-200"
+            className="!text-white prose-invert prose-p:m-0 prose-p:text-white prose-headings:text-white prose-strong:text-white prose-code:text-gray-200 prose-a:text-gray-200 text-wrap break-words"
           />
         </div>
         <div className="text-xs text-gray-500 mt-1 text-right">

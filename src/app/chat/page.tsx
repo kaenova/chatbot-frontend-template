@@ -9,7 +9,6 @@ import LoadingMessage from '@/components/LoadingMessage'
 import ChatInput from '@/components/ChatInput'
 import { siteConfig } from '@/lib/site-config'
 import { decodeBase64 } from '@/lib/chat-utils'
-import { useChatInput } from '@/contexts/ChatInputContext'
 
 // Re-define Message interface here or import from a shared type file if available
 interface Message {
@@ -23,8 +22,9 @@ interface Message {
 export default function ChatPage() {
   const { data: session } = useSession()
   const router = useRouter()
-  const { setInput, setIsLoading, isLoading } = useChatInput()
   const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [Input, setInput] = useState('')
 
   // Function to get time-based greeting
   const getGreeting = () => {
@@ -46,6 +46,9 @@ export default function ChatPage() {
   // Function to handle clicking on a recommendation question
   const handleRecommendationClick = (question: string) => {
     setInput(question)
+    console.log('Set input to:', question)
+    // Optionally auto-submit the question
+    // handleSubmit(new Event('submit') as any)
   }
 
   const handleSubmit = async (e: React.FormEvent, input: string) => {
@@ -208,6 +211,8 @@ export default function ChatPage() {
       {/* Floating Input */}
       <ChatInput
         handleSubmit={handleSubmit}
+        isLoading={isLoading}
+        input={Input}
       />
     </div>
   )

@@ -30,7 +30,7 @@ This frontend is designed to work with a custom inferencing backend. The Next.js
    ```
 
 2. **Implement Required Endpoints:**
-   Your backend must provide these endpoints with JWT authentication:
+   Your backend must provide these endpoints with Basic authentication:
 
    - `POST /chat/inference` - Chat inference with streaming
    - `GET /conversations` - List conversations
@@ -39,13 +39,13 @@ This frontend is designed to work with a custom inferencing backend. The Next.js
    - `GET /conversations/{id}/chats` - Get chat history
 
 3. **Authentication:**
-   - All requests include `Authorization: Bearer <jwt>` header
+   - All requests include `Authorization: Basic <base64>` header
    - JWT is obtained from NextAuth session
    - Backend should validate JWT as per your authentication system
 
 4. **Streaming Response:**
    - Chat inference uses streaming with prefixed messages
-   - Format: `convid:[id]` followed by `c:[chunk]` for each text chunk
+   - Format: `convid:[id]` followed by `c:[base64(chunk)]` for each text chunk
 
 ### Detailed API Documentation
 
