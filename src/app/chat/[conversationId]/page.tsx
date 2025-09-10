@@ -7,6 +7,7 @@ import AssistantMessage from '@/components/AssistantMessage'
 import LoadingMessage from '@/components/LoadingMessage'
 import ChatInput from '@/components/ChatInput'
 import { decodeBase64 } from '@/lib/chat-utils'
+import { useChatInput } from '@/contexts/ChatInputContext'
 
 interface Message {
   id: string
@@ -20,12 +21,22 @@ export default function ConversationPage() {
   const params = useParams()
   const router = useRouter()
   const conversationId = params.conversationId as string
+  const { setIsLoading, isLoading } = useChatInput()
 
   const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Auto-scroll to bottom when component mounted
+  useEffect(() => {
+    const messageContainer = document.getElementById('main-message')
+    if (messageContainer) {
+      messageContainer.scrollTo({
+        top: messageContainer.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }, [isLoadingHistory])
 
   // Load conversation history on mount
   const loadConversationHistory = useCallback(async () => {
@@ -34,7 +45,7 @@ export default function ConversationPage() {
       setError(null)
 
       const response = await fetch(`/api/conversations/${conversationId}/chats?limit=50`)
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           setError('Conversation not found')
@@ -62,7 +73,7 @@ export default function ConversationPage() {
     }
   }, [conversationId, loadConversationHistory])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, input: string) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
@@ -75,7 +86,6 @@ export default function ConversationPage() {
     }
 
     setMessages(prev => [...prev, userMessage])
-    setInput('')
     setIsLoading(true)
 
     // Create assistant message placeholder
@@ -147,6 +157,15 @@ export default function ConversationPage() {
           }
         }
       }
+
+      // After streaming is complete, scroll to the bottom
+      const messageContainer = document.getElementById('main-message')
+      if (messageContainer) {
+        messageContainer.scrollTo({
+          top: messageContainer.scrollHeight,
+          behavior: 'smooth'
+        })
+      }
     } catch (error) {
       console.error('Chat inference error:', error)
       setMessages(prev =>
@@ -161,16 +180,7 @@ export default function ConversationPage() {
     }
   }
 
-  // Auto-scroll to bottom when new messages are added
-  useEffect(() => {
-    const messageContainer = document.getElementById('main-message')
-    if (messageContainer) {
-      messageContainer.scrollTo({
-        top: messageContainer.scrollHeight,
-        behavior: 'smooth'
-      })
-    }
-  }, [messages])
+
 
   if (isLoadingHistory) {
     return (
@@ -204,6 +214,8 @@ export default function ConversationPage() {
       </div>
     )
   }
+
+
 
   return (
     <div className="flex-1 flex flex-col relative max-h-screen overflow-y-hidden" style={{ backgroundColor: 'var(--background)' }}>
@@ -240,10 +252,7 @@ export default function ConversationPage() {
 
       {/* Floating Input */}
       <ChatInput
-        input={input}
-        setInput={setInput}
         handleSubmit={handleSubmit}
-        isLoading={isLoading}
       />
     </div>
   )

@@ -219,9 +219,7 @@ async function handleRequest(request: Request): Promise<Response> {
           const sendChunk = () => {
             if (index < chunks.length) {
               const chunk = chunks[index] + " " // Add space back from mock split
-              console.log("Before encoding chunk:", chunk)
               const data = `c:${toBase64(chunk)}\n`
-              console.log('Sending chunk:', data)
               controller.enqueue(data)
               index++
               // Simulate typing delay
