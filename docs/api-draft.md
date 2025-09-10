@@ -46,6 +46,20 @@ sequenceDiagram
 
 All API requests include JWT authentication via `Authorization: Bearer <token>` header when a user session exists. The JWT is obtained from NextAuth session.
 
+#### Basic Authentication (Mock Server)
+
+For the mock server integration, requests include Basic Authentication:
+- **Username**: `apiuser`
+- **Password**: `securepass123`
+- **Header**: `Authorization: Basic YXBpdXNlcjpzZWN1cmVwYXNzMTIz`
+
+#### User ID Requirement
+
+All requests to the mock server must include a `user_id` query parameter:
+- **Parameter**: `?user_id=<user_id>`
+- **Example**: `GET /conversations?user_id=123`
+- **Validation**: Mock server validates presence and format of user_id
+
 ## Endpoints
 
 ### 1. Chat Inference
@@ -62,12 +76,20 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 }
 ```
 
+**Mock Server Example:**
+```bash
+curl -X POST "http://localhost:8000/chat/inference?user_id=123" \
+  -H "Authorization: Basic YXBpdXNlcjpzZWN1cmVwYXNzMTIz" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Hello"}'
+```
+
 **Response:** Streaming response with encoded format
 - Always sends `convid:[conversationId]` first (whether new or existing conversation)
 - Then sends streaming chunks as `c:[chunktext]`
 - Format: Server-Sent Events or plain text stream with prefixed messages
 
-**Backend Proxy:** Forwards to custom backend's chat inference endpoint.
+**Backend Proxy:** Forwards to custom backend's chat inference endpoint with Basic Auth and user_id.
 
 ---
 
@@ -79,6 +101,12 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 
 **Request Body:** None (toggle operation)
 
+**Mock Server Example:**
+```bash
+curl -X PUT "http://localhost:8000/conversations/conv-123/pin?user_id=123" \
+  -H "Authorization: Basic YXBpdXNlcjpzZWN1cmVwYXNzMTIz"
+```
+
 **Response:**
 ```json
 {
@@ -87,7 +115,7 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 }
 ```
 
-**Backend Proxy:** Updates conversation pin status in backend.
+**Backend Proxy:** Updates conversation pin status in backend with Basic Auth and user_id.
 
 ---
 
@@ -99,6 +127,12 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 
 **Request Body:** None
 
+**Mock Server Example:**
+```bash
+curl -X DELETE "http://localhost:8000/conversations/conv-123?user_id=123" \
+  -H "Authorization: Basic YXBpdXNlcjpzZWN1cmVwYXNzMTIz"
+```
+
 **Response:**
 ```json
 {
@@ -107,7 +141,7 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 }
 ```
 
-**Backend Proxy:** Deletes conversation from backend.
+**Backend Proxy:** Deletes conversation from backend with Basic Auth and user_id.
 
 ---
 
@@ -118,6 +152,12 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 **Purpose:** Retrieve list of conversations for the navbar sidebar.
 
 **Query Parameters:** None
+
+**Mock Server Example:**
+```bash
+curl -X GET "http://localhost:8000/conversations?user_id=123" \
+  -H "Authorization: Basic YXBpdXNlcjpzZWN1cmVwYXNzMTIz"
+```
 
 **Response:**
 ```json
@@ -131,7 +171,7 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 ]
 ```
 
-**Backend Proxy:** Fetches conversation list from backend.
+**Backend Proxy:** Fetches conversation list from backend with Basic Auth and user_id.
 
 ---
 
@@ -142,8 +182,15 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 **Purpose:** Retrieve chat history for a specific conversation with pagination support.
 
 **Query Parameters:**
+- `user_id` (required): User identifier for the request
 - `last_timestamp` (optional): Epoch timestamp (number). If not provided, returns latest chats.
 - `limit` (optional): Number of chat bubbles to return. Default: 50.
+
+**Mock Server Example:**
+```bash
+curl -X GET "http://localhost:8000/conversations/conv-123/chats?user_id=123&limit=20" \
+  -H "Authorization: Basic YXBpdXNlcjpzZWN1cmVwYXNzMTIz"
+```
 
 **Response:**
 ```json
@@ -158,7 +205,7 @@ All API requests include JWT authentication via `Authorization: Bearer <token>` 
 ]
 ```
 
-**Backend Proxy:** Fetches paginated chat history from backend.
+**Backend Proxy:** Fetches paginated chat history from backend with Basic Auth and user_id.
 
 ## Axios Client
 

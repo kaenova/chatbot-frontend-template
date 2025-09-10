@@ -47,47 +47,101 @@ See [`docs/api-draft.md`](docs/api-draft.md) for complete API specifications, re
 
 ## Development Setup
 
-1. **Clone and install dependencies:**
+### Quick Start with Mock Backend
+
+1. **Clone and setup:**
    ```bash
    git clone <repository-url>
    cd chatgpt-frontend
+   make setup
+   ```
+
+2. **Start both services:**
+   ```bash
+   make dev
+   ```
+
+3. **Open in browser:**
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Mock Backend: [http://localhost:8000](http://localhost:8000)
+
+### Manual Setup
+
+1. **Install dependencies:**
+   ```bash
+   # Install frontend dependencies
    bun install
+
+   # Install mock server dependencies
+   cd mock-server && bun install && cd ..
    ```
 
 2. **Environment Configuration:**
-   
+
    Copy the example environment file:
    ```bash
    cp .env.example .env.local
    ```
 
-   ### Mock Authentication (Recommended for Development)
-   
-   For quick development without setting up OAuth, enable mock authentication:
+   The `.env.local` file should include:
    ```env
-   MOCK_AUTH=true
+   # Frontend Configuration
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=development-secret-key
-   ```
-
-   ### Real Authentication (Production)
-   
-   For production or if you want to test real authentication:
-   ```env
    MOCK_AUTH=false
-   NEXTAUTH_URL=http://localhost:3000
-   NEXTAUTH_SECRET=your-production-secret-key
-   GOOGLE_CLIENT_ID=your-google-client-id
-   GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+   # Backend Integration
+   NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+
+   # Optional: Google OAuth (for real authentication)
+   # GOOGLE_CLIENT_ID=your-google-client-id
+   # GOOGLE_CLIENT_SECRET=your-google-client-secret
    ```
 
-3. **Run the development server:**
+3. **Start services:**
+
+   **Option A: Start both services together**
    ```bash
-   bun run dev
+   make dev
+   # Or
+   bun run dev:full
    ```
 
-4. **Open in browser:**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+   **Option B: Start services separately**
+   ```bash
+   # Terminal 1: Start mock backend
+   bun run dev:backend
+   # Or: make dev-backend
+
+   # Terminal 2: Start frontend
+   bun run dev:frontend
+   # Or: make dev-frontend
+   ```
+
+### Development Commands
+
+```bash
+# Full development setup (backend + frontend)
+make dev
+bun run dev:full
+
+# Individual services
+make dev-backend    # Start only mock backend
+make dev-frontend   # Start only frontend
+bun run dev:backend
+bun run dev:frontend
+
+# Utility commands
+make status         # Check running services
+make stop          # Stop all services
+make clean         # Clean up generated files
+make install       # Install all dependencies
+
+# Database operations
+make db-reset      # Reset database
+make db-backup     # Backup database
+make db-restore    # Restore database
+```
 
 ## Mock Authentication
 
@@ -125,6 +179,72 @@ src/
 - `bun run start` - Start production server
 - `bun run lint` - Run ESLint
 
+## API Integration
+
+This frontend integrates with a custom backend API through the following architecture:
+
+```
+Browser Client → Next.js API Routes → Custom Backend
+```
+
+### Request Flow
+
+1. **Browser** makes requests to Next.js API routes (e.g., `/api/conversations`)
+2. **Next.js API Routes** extract JWT from NextAuth session
+3. **Next.js API Routes** forward requests to backend with JWT in Authorization header
+4. **Backend** processes requests and returns responses
+5. **Next.js API Routes** return responses to the browser
+
+### Authentication
+
+All API requests are automatically authenticated:
+- JWT tokens are extracted from NextAuth sessions
+- Tokens are forwarded to backend in `Authorization: Bearer <token>` header
+- No manual token management required in frontend code
+
+### Backend Requirements
+
+Your backend must implement these endpoints:
+
+- `POST /chat/inference` - Chat inference with streaming
+- `GET /conversations` - List conversations
+- `PUT /conversations/:id/pin` - Toggle conversation pin
+- `DELETE /conversations/:id` - Delete conversation
+- `GET /conversations/:id/chats` - Get chat history
+
+### Authentication
+
+All API requests include JWT authentication:
+```javascript
+Authorization: Bearer <jwt_token>
+```
+
+### Mock Backend
+
+A complete mock backend is included in the `mock-server/` directory:
+
+```bash
+# Start mock backend
+make dev-backend
+# Or
+bun run dev:backend
+```
+
+The mock server provides:
+- ✅ Rich markdown responses
+- ✅ Streaming chat responses
+- ✅ Persistent JSON storage
+- ✅ Complete CRUD operations
+- ✅ CORS support
+
+### Environment Variables
+
+```env
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000  # Mock backend URL
+# Or your production backend URL
+NEXT_PUBLIC_BACKEND_URL=https://your-api.com
+```
+
 ## Technologies Used
 
 - **Next.js 15** - React framework with App Router
@@ -133,6 +253,7 @@ src/
 - **NextAuth** - Authentication library
 - **React Markdown** - Markdown rendering
 - **Bun** - Package manager and runtime
+- **Axios** - HTTP client for API calls
 
 ## Production Deployment
 

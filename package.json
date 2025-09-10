@@ -6,7 +6,15 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:full": "make dev",
+    "dev:backend": "cd mock-server && bun run server.ts",
+    "dev:frontend": "bun run dev",
+    "setup": "make setup",
+    "install:all": "make install",
+    "clean": "make clean",
+    "test:api": "curl -X GET http://localhost:8000/conversations",
+    "status": "make status"
   },
   "dependencies": {
     "@types/prismjs": "^1.26.5",
