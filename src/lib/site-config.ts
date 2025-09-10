@@ -29,6 +29,7 @@ export interface SiteConfig {
     }
     welcomeMessage: string
     recommendationQuestions: string[]
+    messageLimit: number // Number of messages to fetch per request
   }
 }
 
@@ -157,6 +158,7 @@ export const siteConfig: SiteConfig = {
       evening: "Good evening"
     },
     welcomeMessage: "I'm your AI assistant. Start a conversation by typing a message below or try one of these suggestions:",
+    messageLimit: 4, // Number of messages to fetch per request, must even number
     recommendationQuestions: [
       "What are the latest trends in web development?",
       "Help me write a professional email",

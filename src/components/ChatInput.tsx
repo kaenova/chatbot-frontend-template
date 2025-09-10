@@ -1,36 +1,45 @@
+'use client'
+
 import React from 'react'
 
 interface ChatInputProps {
-  input: string
-  setInput: (input: string) => void
-  handleSubmit: (e: React.FormEvent) => void
-  isLoading: boolean
+  handleSubmit: (e: React.FormEvent, input: string) => void
+  isLoading: boolean,
+  input?: string,
 }
 
-export default function ChatInput({ input, setInput, handleSubmit, isLoading }: ChatInputProps) {
+export default function ChatInput({ handleSubmit, isLoading, input }: ChatInputProps) {
+  const [Input, setInput] = React.useState('')
+
+  React.useEffect(() => {
+    setInput(Input || input || '')
+  }, [input, Input])
+
+
   return (
     <div className="absolute bottom-0 left-0 right-0 pt-14" style={{ background: `linear-gradient(to top, var(--background), var(--background), transparent)` }}>
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-6 pb-6">
+      <form onSubmit={(e) => handleSubmit(e, Input)} className="max-w-4xl mx-auto px-6 pb-6">
         <div className="flex space-x-4 items-start">
           <div className="flex-1">
             <textarea
-              value={input}
+              value={Input}
+              rows={1}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()
-                  handleSubmit(e)
+                  setInput('')
+                  handleSubmit(e, Input)
                 }
               }}
               placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
               className="resize-y w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:border-transparent shadow-lg min-h-[56px]"
-              style={{ 
+              style={{
                 backgroundColor: 'var(--background)',
                 color: 'var(--foreground)',
                 height: 'auto',
                 minHeight: '56px'
               }}
-              rows={1}
               disabled={isLoading}
               onInput={(e) => {
                 const target = e.target as HTMLTextAreaElement
@@ -41,7 +50,7 @@ export default function ChatInput({ input, setInput, handleSubmit, isLoading }: 
           </div>
           <button
             type="submit"
-            disabled={!input.trim() || isLoading}
+            disabled={!Input.trim() || isLoading}
             className="hover:opacity-80 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-4 rounded-xl transition-colors shadow-lg flex-shrink-0 h-[56px] w-[56px] flex items-center justify-center"
             style={{ backgroundColor: 'var(--accent)' }}
           >

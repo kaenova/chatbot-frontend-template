@@ -34,35 +34,65 @@ export default function MarkdownContent({ content, className = '' }: MarkdownCon
     pre: ({ children }) => <>{children}</>,
     table: ({ children }) => (
       <div className="overflow-x-auto my-4">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-t-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-700 border border-gray-700 rounded-t-lg overflow-hidden">
           {children}
         </table>
       </div>
     ),
     thead: ({ children }) => (
-      <thead className="bg-gray-50 dark:bg-gray-800 rounded-t-lg">
+      <thead className="bg-gray-50 rounded-t-lg">
         {children}
       </thead>
     ),
     tbody: ({ children }) => (
-      <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700 rounded-b-lg">
+      <tbody className="bg-whitedivide-y divide-gray-700 rounded-b-lg">
         {children}
       </tbody>
     ),
     tr: ({ children }) => (
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+      <tr className="hover:bg-gray-50 transition-colors">
         {children}
       </tr>
     ),
     th: ({ children }) => (
-      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+      <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
         {children}
       </th>
     ),
     td: ({ children }) => (
-      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+      <td className="px-4 py-3 text-sm text-gray-900">
         {children}
       </td>
+    ),
+    h1: ({ children }) => (
+      <h1 className="text-3xl font-bold text-gray-900mb-4 mt-2 ">
+        {children}
+      </h1>
+    ),
+    h2: ({ children }) => (
+      <h2 className="text-2xl font-semibold text-gray-900mb-3 mt-2">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="text-xl font-medium text-gray-900mb-2 mt-2">
+        {children}
+      </h3>
+    ),
+    h4: ({ children }) => (
+      <h4 className="text-lg font-medium text-gray-900mb-2 mt-2">
+        {children}
+      </h4>
+    ),
+    h5: ({ children }) => (
+      <h5 className="text-base font-medium text-gray-900mb-2 mt-2">
+        {children}
+      </h5>
+    ),
+    h6: ({ children }) => (
+      <h6 className="text-sm font-medium text-gray-600mb-2 mt-2">
+        {children}
+      </h6>
     ),
     ul: ({ children }) => <ul className="list-disc ml-4">{children}</ul>,
     li: ({ children }) => <li className="mb-1">{children}</li>
