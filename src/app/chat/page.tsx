@@ -7,13 +7,14 @@ import AssistantMessage from '@/components/AssistantMessage'
 import LoadingMessage from '@/components/LoadingMessage'
 import ChatInput from '@/components/ChatInput'
 import { siteConfig } from '@/lib/site-config'
+import { apiClient } from '@/lib/api-client'
 
 // Re-define Message interface here or import from a shared type file if available
 interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
-  timestamp: Date
+  timestamp: number // epoch milliseconds
 }
 
 export default function ChatPage() {
@@ -54,45 +55,68 @@ export default function ChatPage() {
       id: Date.now().toString(),
       role: 'user',
       content: input.trim(),
-      timestamp: new Date()
+      timestamp: Date.now()
     }
 
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsLoading(true)
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `Thank you for your message: "${userMessage.content}". This is a placeholder response. In a real implementation, this would be connected to an AI service like OpenAI's GPT API.
+    // Create assistant message placeholder
+    const assistantMessageId = (Date.now() + 1).toString()
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now()
+    }
 
-Here are some **markdown features** that are supported:
+    setMessages(prev => [...prev, assistantMessage])
 
-| Feature | Description | Example |
-|---------|-------------|---------|
-| **Bold** | Makes text bold | \`**text**\` |
-| *Italic* | Makes text italic | \`*text*\` |
-| \`Code\` | Inline code formatting | \`\`code\`\` |
-| Tables | Structured data display | See below |
-| Lists | Bulleted or numbered lists | - Item 1<br>- Item 2 |
-- **Bold text**
-- *Italic text*
-- \`Inline code\`
-- Lists like this one
+    try {
+      let conversationId: string | undefined
 
-\`\`\`js
-// Code blocks are also supported
-function greet(name) {
-  return \`Hello, \${name}!\`;
-}
-\`\`\``,
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, assistantMessage])
+      await apiClient.postStream(
+        '/chat/inference',
+        { message: userMessage.content },
+        (chunk: string) => {
+          // Handle streaming chunks
+          if (chunk.startsWith('convid:')) {
+            conversationId = chunk.substring(7) // Remove 'convid:' prefix
+          } else if (chunk.startsWith('c:')) {
+            const contentChunk = chunk.substring(2) // Remove 'c:' prefix
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === assistantMessageId
+                  ? { ...msg, content: msg.content + contentChunk }
+                  : msg
+              )
+            )
+          }
+        },
+        (error) => {
+          console.error('Streaming error:', error)
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: 'Sorry, there was an error processing your request.' }
+                : msg
+            )
+          )
+        }
+      )
+    } catch (error) {
+      console.error('Chat inference error:', error)
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === assistantMessageId
+            ? { ...msg, content: 'Sorry, there was an error processing your request.' }
+            : msg
+        )
+      )
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
 

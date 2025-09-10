@@ -5,7 +5,7 @@ interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
-  timestamp: Date
+  timestamp: number // epoch milliseconds
 }
 
 interface AssistantMessageProps {
@@ -30,7 +30,7 @@ export default function AssistantMessage({ message, showIcon = false }: Assistan
           <MarkdownContent content={message.content} />
         </div>
         <div className="text-xs text-gray-500 mt-1 text-left">
-          {message.timestamp.toLocaleTimeString()}
+          {new Date(message.timestamp).toLocaleTimeString()}
         </div>
       </div>
     </div>

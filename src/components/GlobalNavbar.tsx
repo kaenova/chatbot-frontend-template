@@ -20,10 +20,10 @@ interface GlobalNavbarProps {
 // Helper component to render chat group sections
 interface ChatGroupProps {
   title: string
-  chats: { id: string; title: string; date: string; createdAt: Date; isPinned: boolean }[]
+  chats: { id: string; title: string; date: string; createdAt: number; isPinned: boolean }[]
   onChatClick: (chatId: string) => void
-  onTogglePin?: (chatId: string) => void
-  onDeleteChat?: (chatId: string) => void
+  onTogglePin?: (chatId: string) => Promise<void>
+  onDeleteChat?: (chatId: string) => Promise<void>
   isCollapsed?: boolean
   isMobile?: boolean
 }
@@ -97,10 +97,10 @@ function ChatGroup({ title, chats, onChatClick, onTogglePin, onDeleteChat, isCol
               </div>
               <div className="flex items-center space-x-1">
                 {onTogglePin && (
-                  <button 
-                    onClick={(e) => {
+                  <button
+                    onClick={async (e) => {
                       e.stopPropagation()
-                      onTogglePin(chat.id)
+                      await onTogglePin(chat.id)
                     }}
                     className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-yellow-500 p-1 transition-all"
                     title={chat.isPinned ? "Unpin chat" : "Pin chat"}
@@ -112,8 +112,8 @@ function ChatGroup({ title, chats, onChatClick, onTogglePin, onDeleteChat, isCol
                 )}
                 {
                   onDeleteChat &&
-                  <button 
-                    onClick={(e) => {e.stopPropagation(); onDeleteChat(chat.id)}} 
+                  <button
+                    onClick={async (e) => {e.stopPropagation(); await onDeleteChat(chat.id)}}
                     className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-700 p-1 transition-all"
                     title="Delete chat"
                   >
@@ -164,7 +164,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const groupedChats = getGroupedChatHistory()
 
   // Handle delete with confirmation popup
-  const handleDeleteChat = (chatId: string) => {
+  const handleDeleteChat = async (chatId: string) => {
     const allChats = [
       ...groupedChats.pinned,
       ...groupedChats.today,
