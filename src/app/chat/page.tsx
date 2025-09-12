@@ -235,6 +235,7 @@ export default function ChatPage() {
             <>
               <MessagesList messages={messages} />
               <StreamingMessage streamingMessage={streamingMessage} />
+              <div className='w-full h-20'></div>
             </>
           )}
           {isLoading && !streamingMessage && <LoadingMessage />}
