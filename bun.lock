@@ -20,6 +20,7 @@
         "remark-code-title": "^0.2.5",
         "remark-gfm": "^4.0.1",
         "remark-lint": "^10.0.1",
+        "remark-rehype": "^11.1.2",
       },
       "devDependencies": {
         "@eslint/eslintrc": "^3",
