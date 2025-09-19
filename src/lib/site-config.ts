@@ -50,14 +50,14 @@ export interface NavigationItem {
 
 // Default configuration - Customize these values to change your site branding
 export const siteConfig: SiteConfig = {
-  name: "ChatGPT Clone",
-  title: "ChatGPT Clone",
+  name: "SMBCI Chat",
+  title: "SMBCI Chat",
   description: "A ChatGPT-like interface built with Next.js and NextAuth",
   url: "https://chatgpt-clone.com", // Update with your actual domain
   keywords: ["chatgpt", "ai", "artificial intelligence", "chat", "assistant", "nextjs", "react"],
   favicon: "/favicon.ico",
   logo: {
-    src: "https://logodix.com/logo/2013589.png", // Change this to your logo path
+    src: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Logo_SMBC-Indonesia.svg", // Change this to your logo path
     alt: "ChatGPT Clone Logo",
     width: 118,
     height: 24
