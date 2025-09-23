@@ -190,7 +190,8 @@ const Composer: FC = () => {
 const ComposerAction: FC = () => {
   return (
     <div className="aui-composer-action-wrapper relative mx-1 mt-2 mb-2 flex items-center justify-between">
-      <ComposerAddAttachment />
+      {/* Disable it for now, because we dont support file uploads yet
+      <ComposerAddAttachment /> */}
 
       <ThreadPrimitive.If running={false}>
         <ComposerPrimitive.Send asChild>
@@ -280,9 +281,10 @@ const AssistantActionBar: FC = () => {
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
       <ActionBarPrimitive.Reload asChild>
+        {/* Disble for now, because we dont support regenerating messages yet
         <TooltipIconButton tooltip="Refresh">
           <RefreshCwIcon />
-        </TooltipIconButton>
+        </TooltipIconButton> */}
       </ActionBarPrimitive.Reload>
     </ActionBarPrimitive.Root>
   );
@@ -302,7 +304,9 @@ const UserMessage: FC = () => {
             <MessagePrimitive.Parts />
           </div>
           <div className="aui-user-action-bar-wrapper absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 pr-2">
-            <UserActionBar />
+
+          {/* Disable for now, because we dont support editing user messages yet
+            <UserActionBar /> */}
           </div>
         </div>
 
