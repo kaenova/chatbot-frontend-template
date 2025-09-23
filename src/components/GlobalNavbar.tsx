@@ -56,7 +56,7 @@ function ChatGroup({ title, chats, onChatClick, onTogglePin, onDeleteChat, isCol
 
   return (
     <div className="mb-4">
-      <h3 className="text-sm font-bold text-[var(--accent)] mb-2 px-2 flex items-center">
+      <h3 className="text-sm font-bold text-[var(--primary)] mb-2 px-2 flex items-center">
         {title}
         {title === "Pinned" && (
           <svg className="w-4 h-4 ml-1 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
@@ -371,7 +371,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
           {
             isCollapsed ? null :
               <div className="flex items-center justify-between">
-                <h1 className="font-bold text-left text-[var(--accent)]">{siteConfig.name}</h1>
+                <h1 className="font-bold text-left text-[var(--primary)]">{siteConfig.name}</h1>
                 <button
                   onClick={() => setIsPinned(!isPinned)}
                   className="p-1 hover:bg-gray-200 rounded transition-colors"

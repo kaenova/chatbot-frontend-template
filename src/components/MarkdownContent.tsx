@@ -3,6 +3,7 @@
 import React from 'react'
 import ReactMarkdown, { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkRehype from 'remark-rehype'
 import CodeBlock, { InlineCode } from './CodeBlock'
 
 interface MarkdownContentProps {
@@ -94,9 +95,11 @@ export default function MarkdownContent({ content, className = '' }: MarkdownCon
         {children}
       </h6>
     ),
-    ul: ({ children }) => <ul className="list-disc ml-4">{children}</ul>,
-    li: ({ children }) => <li className="mb-1">{children}</li>,
+    ul: (props) => <ul className="list-disc ml-4" {...props}>{props.children}</ul>,
+    li: (props) => <li className="mb-1" {...props}>{props.children}</li>,
     hr: () => <hr className="my-4 border-gray-300 w-min" />,
+    a: (props) => <a className='rounded-lg w-2 text-[var(--primary)] font-bold p-0.5 px-2 text-ium bg-[var(--primary)]/20 hover:bg-[var(--primary)]/15' {...props}>{props.children}</a>,
+    sup: (props) => <sup className='' {...props}>{props.children}</sup>
   }
 
   return (
