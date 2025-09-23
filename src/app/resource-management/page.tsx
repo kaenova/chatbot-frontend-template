@@ -60,7 +60,7 @@ export default function ResourceManagementPage() {
               onClick={handleUpload}
               disabled={files.length === 0}
               className="px-4 py-2 text-white rounded-lg hover:opacity-80 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-              style={{ backgroundColor: 'var(--accent)' }}
+              style={{ backgroundColor: 'var(--primary)' }}
             >
               Upload Files
             </button>

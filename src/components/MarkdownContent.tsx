@@ -98,7 +98,7 @@ export default function MarkdownContent({ content, className = '' }: MarkdownCon
     ul: (props) => <ul className="list-disc ml-4" {...props}>{props.children}</ul>,
     li: (props) => <li className="mb-1" {...props}>{props.children}</li>,
     hr: () => <hr className="my-4 border-gray-300 w-min" />,
-    a: (props) => <a className='rounded-lg w-2 text-[var(--accent)] font-bold p-0.5 px-2 text-ium bg-[var(--accent)]/20 hover:bg-[var(--accent)]/15' {...props}>{props.children}</a>,
+    a: (props) => <a className='rounded-lg w-2 text-[var(--primary)] font-bold p-0.5 px-2 text-ium bg-[var(--primary)]/20 hover:bg-[var(--primary)]/15' {...props}>{props.children}</a>,
     sup: (props) => <sup className='' {...props}>{props.children}</sup>
   }
 

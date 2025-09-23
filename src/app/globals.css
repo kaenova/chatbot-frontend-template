@@ -3,11 +3,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+
 :root {
   /* Theme Colors */
-  --accent: oklch(0.97 0 0);
+  --background: #ffffff;
+  --foreground: #000000;
+  /* --accent: #00765a; */
   --sidebar-bg: #ffffff;
   --header-bg: #00765a;
+  
+  /* Font variables */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  /* Theme Colors */
+  --accent: oklch(0.97 0 0);
+  /* --sidebar-bg: #ffffff;
+  --header-bg: #00765a; */
 
   /* Font variables */
   --font-sans: var(--font-geist-sans);
@@ -19,7 +31,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #00765a;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);

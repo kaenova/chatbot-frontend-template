@@ -57,7 +57,7 @@ export default function SignIn() {
           <div className="mx-auto">
             <Logo className="justify-center" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--accent)' }}>
+          <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'var(--primary)' }}>
             Welcome to {siteConfig.title}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -86,7 +86,7 @@ export default function SignIn() {
               style={{ 
                 backgroundColor: 'var(--background)',
                 color: 'var(--foreground)',
-                borderColor: 'var(--accent)'
+                borderColor: 'var(--primary)'
               }}
               placeholder="Username"
             />
@@ -107,7 +107,7 @@ export default function SignIn() {
               style={{ 
                 backgroundColor: 'var(--background)',
                 color: 'var(--foreground)',
-                borderColor: 'var(--accent)'
+                borderColor: 'var(--primary)'
               }}
               placeholder="Password"
             />
@@ -124,7 +124,7 @@ export default function SignIn() {
               type="submit"
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
-              style={{ backgroundColor: 'var(--accent)' }}
+              style={{ backgroundColor: 'var(--primary)' }}
             >
               {isLoading ? (
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

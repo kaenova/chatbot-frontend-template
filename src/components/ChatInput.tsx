@@ -52,7 +52,7 @@ export default function ChatInput({ handleSubmit, isLoading, input }: ChatInputP
             type="submit"
             disabled={!Input.trim() || isLoading}
             className="hover:opacity-80 disabled:bg-gray-300 disabled:cursor-not-allowed text-white p-4 rounded-xl transition-colors shadow-lg flex-shrink-0 h-[56px] w-[56px] flex items-center justify-center"
-            style={{ backgroundColor: 'var(--accent)' }}
+            style={{ backgroundColor: 'var(--primary)' }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

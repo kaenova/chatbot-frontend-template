@@ -108,7 +108,7 @@ export default function ChatSearch({ isCollapsed = false, isMobile = false, onCh
           placeholder="Search chats..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+          className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
         />
         {searchQuery && (
           <button
@@ -132,7 +132,7 @@ export default function ChatSearch({ isCollapsed = false, isMobile = false, onCh
               >
                 <div className="flex items-center space-x-3">
                   <div className="flex-shrink-0">
-                    <div className="w-2 h-2 bg-[var(--accent)] rounded-full"></div>
+                    <div className="w-2 h-2 bg-[var(--primary)] rounded-full"></div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
