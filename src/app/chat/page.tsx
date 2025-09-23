@@ -4,8 +4,14 @@ import React from 'react'
 import { Thread } from "@/components/assistant-ui/thread";
 import { AssistantRuntimeProvider, ChatModelAdapter, useLocalRuntime } from '@assistant-ui/react';
 import { decodeBase64 } from '@/lib/chat-utils';
+import { useRouter } from 'next/navigation';
 
-const MyModelAdapter: ChatModelAdapter = {
+
+function ChatPage() {
+
+  const router = useRouter()
+
+  const MyModelAdapter: ChatModelAdapter = {
   async *run({ messages, abortSignal }) {
     // Get the last user message to send to your backend
     const lastMessage = messages[messages.length - 1];
@@ -44,6 +50,7 @@ const MyModelAdapter: ChatModelAdapter = {
       const decoder = new TextDecoder();
       let buffer = '';
       let accumulatedContent = '';
+      let conversationId = null;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -57,9 +64,7 @@ const MyModelAdapter: ChatModelAdapter = {
           if (line.trim()) {
             // Handle streaming chunks
             if (line.startsWith('convid:')) {
-              // Handle conversation ID if needed for your use case
-              // const conversationId = line.substring(7);
-              // You could store this in context or handle it as needed
+              conversationId = line.substring(7);
             } else if (line.startsWith('c:')) {
               const contentChunk = line.substring(2); // Remove 'c:' prefix
               const decodedChunk = decodeBase64(contentChunk);
@@ -73,6 +78,13 @@ const MyModelAdapter: ChatModelAdapter = {
           }
         }
       }
+
+      if (conversationId) { 
+        // Do something with the conversationId if needed
+        router.push(`/chat/${conversationId}`)
+      }
+
+      // Router to the conversation id
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         // Handle abort gracefully
@@ -83,8 +95,8 @@ const MyModelAdapter: ChatModelAdapter = {
   },
 };
 
-function ChatPage() {
-  const runtime = useLocalRuntime(MyModelAdapter);
+    const runtime = useLocalRuntime(MyModelAdapter, {
+    });
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>

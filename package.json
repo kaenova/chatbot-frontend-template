@@ -39,6 +39,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
+    "react-shiki": "^0.8.0",
     "react-syntax-highlighter": "^15.6.6",
     "remark-code-blocks": "^2.0.1",
     "remark-code-extra": "^1.0.1",
