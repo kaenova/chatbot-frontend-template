@@ -232,7 +232,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await fetch('/api/conversations')
+      const response = await fetch('/api/be/conversations')
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -244,7 +244,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
         createdAt: conv.created_at,
         isPinned: conv.is_pinned
       }))
-      setChatHistory([...conversations, ...MockChatHistory])
+      setChatHistory([...conversations])
     } catch (err) {
       setError('Failed to load conversations')
       console.error('Load conversations error:', err)
