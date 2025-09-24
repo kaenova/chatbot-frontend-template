@@ -49,7 +49,7 @@ function ChatPage() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <RedirectWhenDone />
-      <div className='h-screen'>
+      <div className='h-screen mt-16'>
         <Thread />
       </div>
     </AssistantRuntimeProvider>

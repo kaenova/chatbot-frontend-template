@@ -240,8 +240,8 @@ export function ChatProvider({ children }: ChatProviderProps) {
       const conversations = data.map((conv) => ({
         id: conv.id,
         title: conv.title,
-        date: formatRelativeTime(conv.created_at),
-        createdAt: conv.created_at,
+        date: formatRelativeTime(conv.created_at * 1000),
+        createdAt: conv.created_at * 1000,
         isPinned: conv.is_pinned
       }))
       setChatHistory([...conversations])

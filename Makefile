@@ -18,7 +18,7 @@ help:
 	@echo "  make langgraph-test   - Test LangGraph server setup"
 
 # Development - Start both services
-dev:
+dev-old:
 	@echo "🚀 Starting both mock backend and frontend..."
 	@echo "📡 Backend will be available at: http://localhost:8000"
 	@echo "🌐 Frontend will be available at: http://localhost:3000"
@@ -37,7 +37,7 @@ dev-frontend:
 	@sleep 2 && bun run dev
 
 # Start frontend and LangGraph FastAPI server
-dev-graph:
+dev:
 	@echo "🚀 Starting frontend and LangGraph FastAPI server..."
 	@echo "🤖 LangGraph API will be available at: http://localhost:8000"
 	@echo "🌐 Frontend will be available at: http://localhost:3000"

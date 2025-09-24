@@ -114,7 +114,7 @@ function ChatPage() {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className='h-screen'>
+      <div className='h-screen pt-16 md:pt-0'>
         {isLoadingHistory ? (
           // Show loading state while fetching conversation history
           <div className="h-full flex items-center justify-center">
