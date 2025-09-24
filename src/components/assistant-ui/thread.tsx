@@ -39,7 +39,7 @@ export const Thread: FC = () => {
         <ThreadPrimitive.Root
           className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
           style={{
-            ["--thread-max-width" as string]: "44rem",
+            ["--thread-max-width" as string]: "50rem",
           }}
         >
           <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll px-4">
@@ -300,7 +300,7 @@ const UserMessage: FC = () => {
         <UserMessageAttachments />
 
         <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-          <div className="aui-user-message-content rounded-3xl bg-muted px-5 py-2.5 break-words text-foreground">
+          <div className="aui-user-message-content rounded-3xl bg-primary/15 px-5 py-2.5 break-words text-foreground">
             <MessagePrimitive.Parts />
           </div>
           <div className="aui-user-action-bar-wrapper absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 pr-2">
