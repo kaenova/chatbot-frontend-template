@@ -14,7 +14,6 @@ import {
   ChevronRightIcon,
   CopyIcon,
   PencilIcon,
-  RefreshCwIcon,
   Square,
 } from "lucide-react";
 import type { FC } from "react";
@@ -190,8 +189,8 @@ const Composer: FC = () => {
 const ComposerAction: FC = () => {
   return (
     <div className="aui-composer-action-wrapper relative mx-1 mt-2 mb-2 flex items-center justify-between">
-      {/* Disable it for now, because we dont support file uploads yet
-      <ComposerAddAttachment /> */}
+      {/* Disable it for now, because we dont support file uploads yet */}
+      <ComposerAddAttachment />
 
       <ThreadPrimitive.If running={false}>
         <ComposerPrimitive.Send asChild>

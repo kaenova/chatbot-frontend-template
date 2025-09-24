@@ -62,7 +62,6 @@ def call_model(state: AgentState, config = None) -> Dict[str, List[BaseMessage]]
     # Return the response
     return {"messages": [response]}
 
-
 # Initialize checkpointer
 db = aiosqlite.connect("./mock-langgraph-db.db")
 checkpointer = AsyncSqliteSaver(db)

@@ -8,6 +8,8 @@ import os
 import json
 import uuid
 import time
+import base64
+import httpx
 
 
 from typing import Annotated
@@ -44,7 +46,7 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 # Inference function
-async def generate_stream(input_message: str, conversation_id: str):
+async def generate_stream(input_message: HumanMessage, conversation_id: str):
     # Generate unique message ID
     message_id = str(uuid.uuid4())
     
@@ -58,7 +60,7 @@ async def generate_stream(input_message: str, conversation_id: str):
 
     try:
         async for msg, metadata in graph.astream(
-            {"messages": input_message},
+            {"messages": [input_message]},
             config={"configurable": {"thread_id": conversation_id}},
             stream_mode="messages",
         ):
@@ -146,7 +148,45 @@ async def chat_completions(request: ChatRequest, _: Annotated[str, Depends(get_a
         return {"error": "Missing userid header"}
 
     conversation_id = generate_uuid()
-    input_message = request.messages[-1] if request.messages else ""
+    
+    input_message = request.messages[-1]
+    if not input_message:
+        raise HTTPException(status_code=400, detail="No input message provided")
+
+
+    final_content_mapped = []
+    for content in input_message['content']:
+        content_type = content.get("type")
+        if content_type not in ['text', 'image']:
+            continue
+        
+         # Map content to LangChain message format
+        if content['type'] == 'text':
+            final_content_mapped.append({
+                "type": "text",
+                "text": content.get("text", "")
+            })
+        elif content['type'] == 'image':
+            image_base64_data = content.get("image")
+            if not image_base64_data:
+                continue
+
+            final_content_mapped.append({
+            "type": "image_url",
+            "image_url": {"url": f"{image_base64_data}"},
+            })
+        
+
+    image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+    image_data = base64.b64encode(httpx.get(image_url).content).decode("utf-8")
+
+    final_content_mapped.append({
+        "type": "image_url",
+        "image_url": {"url": f"data:image/png;base64,{image_data}"},
+    })
+
+    # print("FINAL CONTENT MAPPED: ", final_content_mapped)
+    input_message = HumanMessage(content=final_content_mapped)
 
     # Add user and the conversation id to the database
     db_manager.create_conversation(conversation_id, userid)
@@ -201,10 +241,19 @@ def get_conversations(_: Annotated[str, Depends(get_authenticated_user)], userid
             first_message = conv_graph_messages[0]
             content = first_message.content
 
-            if isinstance(content, list) and len(content) > 0 and content[0]['type'] == 'text':
-                title = content[0]['text']
-            elif type(content) is str:
-                title = content
+            if isinstance(content, str):
+                title = content[:30] + ("..." if len(content) > 30 else "")
+            elif isinstance(content, list) and len(content) > 0:
+                # Get first text content from the list
+                for item in content:
+                    if isinstance(item, dict) and item.get("type") == "text":
+                        text = item.get("text", "")
+                        title = text[:30] + ("..." if len(text) > 30 else "")
+                        break
+                    elif isinstance(item, str):
+                        title = item[:30] + ("..." if len(item) > 30 else "")
+                        break
+
 
         response.append({
             "id": conv.id,
