@@ -1,16 +1,24 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Thread } from "@/components/assistant-ui/thread";
-import { AssistantRuntimeProvider, ChatModelAdapter, ThreadHistoryAdapter, useLocalRuntime } from '@assistant-ui/react';
-import { decodeBase64 } from '@/lib/chat-utils';
+import { AssistantRuntimeProvider, ThreadHistoryAdapter } from '@assistant-ui/react';
 import { useParams } from 'next/navigation';
+import { useDataStreamRuntime } from '@assistant-ui/react-data-stream';
+import {ThreadMessage} from '@assistant-ui/react'
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface BackendMessage {
-  id: string
-  conversation_id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: number
+  message: {
+    id: string
+    role: 'user' | 'assistant'
+    content: string | { type: string; [key: string]: any }[]
+    createdAt: string // ISO date string
+    status?: { type: string; reason: string } | null
+    metadata: { custom: Record<string, any> },
+    attchments?: any[] // Only for user messages
+  },
+  parentId: string | null
 }
 
 function ChatPage() {
@@ -19,96 +27,18 @@ function ChatPage() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const MyModelAdapter: ChatModelAdapter = {
-  async *run({ messages, abortSignal }) {
-    // Get the last user message to send to your backend
-    const lastMessage = messages[messages.length - 1];
-    if (!lastMessage || lastMessage.role !== 'user') {
-      throw new Error('No user message found');
-    }
-
-    // Extract text content from the message
-    const messageContent = lastMessage.content
-      .filter((content) => content.type === 'text')
-      .map((content) => (content as { type: 'text'; text: string }).text)
-      .join('');
-
-    try {
-      // Call your existing backend API with conversation ID
-      const response = await fetch('/api/chat/inference', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: messageContent,
-          conversation_id: conversationId,
-        }),
-        signal: abortSignal,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No response stream');
-      }
-
-      const decoder = new TextDecoder();
-      let buffer = '';
-      let accumulatedContent = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (line.trim()) {
-            // Handle streaming chunks
-            if (line.startsWith('convid:')) {
-              // Handle conversation ID if needed for your use case
-              // const conversationId = line.substring(7);
-              // You could store this in context or handle it as needed
-            } else if (line.startsWith('c:')) {
-              const contentChunk = line.substring(2); // Remove 'c:' prefix
-              const decodedChunk = decodeBase64(contentChunk);
-              accumulatedContent += decodedChunk;
-              
-              // Yield the accumulated content
-              yield {
-                content: [{ type: "text", text: accumulatedContent }],
-              };
-            }
-          }
-        }
-      }
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        // Handle abort gracefully
-        return;
-      }
-      throw error;
-    }
-  },
-};
-
   const HistoryAdapter: ThreadHistoryAdapter = {
     async load() {
       try {
+        if (!conversationId) {
+          return { messages: [] };
+        }
+
         setIsLoadingHistory(true)
         setError(null)
 
+        const fetchURL = `/api/be/conversations/${conversationId}`
 
-        const fetchURL = `/api/conversations/${conversationId}/chats?limit=50`
-
-        console.log(fetchURL)
-        
         // Load messages from your existing conversation API
         const response = await fetch(fetchURL);
         
@@ -122,29 +52,44 @@ function ChatPage() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
+        const resMsg: BackendMessage[] = await response.json();
 
-        const backendMessages: BackendMessage[] = await response.json();
+        function mapBackendToThreadMessage(msg: BackendMessage): {message: ThreadMessage, parentId: string | null} {
+          
+          const adjustedContent: { type: string; [key: string]: any }[] = []
+          if (typeof msg.message.content === 'string') {
+            adjustedContent.push({ type: 'text', text: msg.message.content })
+          }
+          else if (Array.isArray(msg.message.content)) {
+            for (const contentItem of msg.message.content) {
+              if (contentItem.type === 'text' && typeof contentItem.text === 'string') {
+                adjustedContent.push({ type: 'text', text: contentItem.text })
+              }
+            }
+          }
 
-        console.log(backendMessages)
+          return {
+            parentId: msg.parentId,
+            message: {
+              id: msg.message.id,
+              role: msg.message.role,
+              // @ts-expect-error // The type definition in assistant-ui seems incorrect for content, currentluy only support string text
+              content: adjustedContent,
+              createdAt: new Date(msg.message.createdAt),
+              metadata: { custom: {} },
+              ...(msg.message.role === 'user' ? { attachments: [] } : {}),
+              ...(msg.message.role === 'assistant' ? { status: { type: 'complete', reason: 'stop' } } : {}),
+            }
+          }
+        
+        }
         
         // Convert backend message format to assistant-ui format
-        const messages = backendMessages
-          .sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp
-          .map((msg, index) => ({
-            message: {
-              id: msg.id,
-              role: msg.role,
-              content: [{ type: 'text', text: msg.content }],
-              createdAt: new Date(msg.timestamp),
-              status: msg.role === 'assistant' ? { type: 'complete', reason: 'stop' } : undefined,
-              metadata: { custom: {} },
-              ...(msg.role === 'user' ? { attachments: [] } : {}),
-            } as import('@assistant-ui/react').ThreadMessage, // Type assertion for compatibility
-            parentId: index > 0 ? backendMessages[index - 1].id : null,
-          }));
+        const messages = resMsg
+          .map((d) => mapBackendToThreadMessage(d));
         console.log(messages)
         setIsLoadingHistory(false)
-        return { messages };
+        return { messages: messages };
       } catch (error) {
         console.error('Failed to load conversation history:', error);
         setError('Failed to load conversation history')
@@ -160,11 +105,12 @@ function ChatPage() {
     },
   }
 
-    const runtime = useLocalRuntime(MyModelAdapter, {
-      adapters: {
-        history: HistoryAdapter,
-      }
-    });
+   const runtime = useDataStreamRuntime({
+    api: '/api/be/conversations/' + conversationId + '/chat',
+    adapters: {
+      history: HistoryAdapter,
+    }
+  });
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>

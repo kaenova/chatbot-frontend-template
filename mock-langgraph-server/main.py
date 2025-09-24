@@ -193,8 +193,19 @@ def get_conversations(_: Annotated[str, Depends(get_authenticated_user)], userid
         # Get the first message from the conversation to use as title
         # For now, we'll use a default title since we don't store message content in metadata
         # In a real implementation, you might want to fetch the first message from LangGraph state
-        title = f"Conversation {conv.id[:8]}..."
-        
+        conv_graph_val = graph.get_state(config={"configurable": {"thread_id": conv.id}}).values
+        conv_graph_messages = conv_graph_val.get("messages", []) if conv_graph_val else []
+        title = f"Conversations {conv.id[:8]}..."
+
+        if conv_graph_messages:
+            first_message = conv_graph_messages[0]
+            content = first_message.content
+
+            if isinstance(content, list) and len(content) > 0 and content[0]['type'] == 'text':
+                title = content[0]['text']
+            elif type(content) is str:
+                title = content
+
         response.append({
             "id": conv.id,
             "title": title,
@@ -304,23 +315,24 @@ def delete_conversation(_: Annotated[str, Depends(get_authenticated_user)], user
     
     return {"message": "Conversation deleted successfully"}
 
-class PinRequest(BaseModel):
-    is_pinned: bool
-
 @app.post("/conversations/{conversation_id}/pin")
-def pin_conversation(request: PinRequest, _: Annotated[str, Depends(get_authenticated_user)], userid: Annotated[str | None, Header()] = None, conversation_id: str = ""):
+def pin_conversation(_: Annotated[str, Depends(get_authenticated_user)], userid: Annotated[str | None, Header()] = None, conversation_id: str = ""):
     """Pin or unpin a conversation."""
 
     if not userid:
         return {"error": "Missing userid header"}
     
+    existing_data = db_manager.get_conversation(conversation_id, userid)
+    if not existing_data:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
     # Pin or unpin the conversation in the database
-    updated = db_manager.pin_conversation(conversation_id, userid, request.is_pinned)
+    updated = db_manager.pin_conversation(conversation_id, userid, not existing_data.is_pinned)
     
     if not updated:
         raise HTTPException(status_code=404, detail="Conversation not found")
     
-    action = "pinned" if request.is_pinned else "unpinned"
+    action = "pinned" if updated else "unpinned"
     return {"message": f"Conversation {action} successfully"}
 
 if __name__ == "__main__":

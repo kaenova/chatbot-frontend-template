@@ -256,8 +256,11 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const togglePinChat = async (chatId: string) => {
     try {
       setError(null)
-      const response = await fetch(`/api/conversations/${chatId}/pin`, {
-        method: 'PUT',
+      const response = await fetch(`/api/be/conversations/${chatId}/pin`, {
+        method: 'POST',
+        body: JSON.stringify({
+          is_pinned: !chatHistory.find(chat => chat.id === chatId)?.isPinned
+        }),
       })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -279,7 +282,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const deleteChat = async (chatId: string) => {
     try {
       setError(null)
-      const response = await fetch(`/api/conversations/${chatId}`, {
+      const response = await fetch(`/api/be/conversations/${chatId}`, {
         method: 'DELETE',
       })
       if (!response.ok) {
