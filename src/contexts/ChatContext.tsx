@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import { formatRelativeTime } from '@/lib/date-utils'
+import { useSession } from 'next-auth/react'
 
 interface ChatItem {
   id: string
@@ -210,23 +211,30 @@ const MockChatHistory: ChatItem[] = [
 
 export function ChatProvider({ children }: ChatProviderProps) {
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([])
+  const { status } = useSession()
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Load conversations on mount
   useEffect(() => {
-    loadConversations()
-    const autoUpdate = setInterval(() => {
-      loadConversations()
-    }, 20 * 1000); // Refresh every 20 seconds
-    
+    if (status == 'authenticated') {
 
-    return () => {
-      clearInterval(autoUpdate)
+      loadConversations()
+      const autoUpdate = setInterval(() => {
+        
+        loadConversations()
+      }, 20 * 1000); // Refresh every 20 seconds
+      
+      
+      return () => {
+        clearInterval(autoUpdate)
+      }
     }
 
-  }, [])
+    return () => {}
+
+  }, [status])
 
   const loadConversations = async () => {
     try {

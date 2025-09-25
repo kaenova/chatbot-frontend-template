@@ -12,13 +12,13 @@ interface ProvidersProps {
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <ChatProvider>
-      <ModalProvider>
-        <SessionProvider>
+    <SessionProvider>
+      <ChatProvider>
+        <ModalProvider>
           {children}
           <ConfirmationModal />
-        </SessionProvider>
-      </ModalProvider>
-    </ChatProvider>
+        </ModalProvider>
+      </ChatProvider>
+    </SessionProvider>
   )
 }
