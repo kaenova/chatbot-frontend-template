@@ -1,6 +1,5 @@
 'use client'
 
-import { signOut } from "next-auth/react"
 import { User } from "next-auth"
 import { useState, useEffect } from "react"
 import Image from "next/image"
@@ -155,10 +154,10 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
     localStorage.setItem('sidebarPinned', JSON.stringify(isPinned))
   }, [isPinned])
 
-  // Custom signOut function that clears localStorage
+  // Custom signOut function that clears localStorage and redirects to signout page
   const handleSignOut = () => {
     localStorage.removeItem('sidebarPinned')
-    signOut()
+    router.push('/auth/signout')
   }
 
   // Get grouped chat history

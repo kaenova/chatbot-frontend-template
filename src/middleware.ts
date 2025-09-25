@@ -13,6 +13,7 @@ export async function middleware(request: NextRequest) {
   const isOnSettings = request.nextUrl.pathname.startsWith('/settings')
   const isOnResourceManagement = request.nextUrl.pathname.startsWith('/resource-management')
   const isOnAuth = request.nextUrl.pathname.startsWith('/auth')
+  const isOnSignout = request.nextUrl.pathname === '/auth/signout'
   const isOnRoot = request.nextUrl.pathname === '/'
   
   // Protected paths that require authentication
@@ -20,9 +21,14 @@ export async function middleware(request: NextRequest) {
   
   if (protectedPaths) {
     if (isLoggedIn) return NextResponse.next()
-    // Redirect unauthenticated users to login page
-    return NextResponse.redirect(new URL('/auth/signin', request.url))
+    // Redirect unauthenticated users to login page with callback URL
+    const signInUrl = new URL('/auth/signin', request.url)
+    signInUrl.searchParams.set('next', request.nextUrl.pathname + request.nextUrl.search)
+    return NextResponse.redirect(signInUrl)
   } else if (isLoggedIn && (isOnAuth || isOnRoot)) {
+    // Allow access to signout page even when logged in
+    if (isOnSignout) return NextResponse.next()
+    // Redirect other auth pages and root when logged in
     return NextResponse.redirect(new URL('/chat', request.url))
   }
   

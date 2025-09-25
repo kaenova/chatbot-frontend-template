@@ -2,9 +2,10 @@
 
 import { signIn } from "next-auth/react"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Logo from "@/components/Logo"
 import { getSiteConfig } from "@/lib/site-config"
+import { getSafeCallbackUrl } from "@/lib/callback-utils"
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false)
@@ -12,6 +13,8 @@ export default function SignIn() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const next = getSafeCallbackUrl(searchParams.get('next'))
   const siteConfig = getSiteConfig()
 
   const handleCredentialsSignIn = async (e: React.FormEvent) => {
@@ -29,7 +32,7 @@ export default function SignIn() {
       if (result?.error) {
         setError("Invalid username or password")
       } else {
-        router.push('/chat')
+        router.push(next)
       }
     } catch (err) {
       console.error('Sign in error:', err)
@@ -41,13 +44,13 @@ export default function SignIn() {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
-    await signIn('google', { callbackUrl: '/chat' })
+    await signIn('google', { callbackUrl: next })
     setIsLoading(false)
   }
 
   const handleMockSignIn = () => {
-    // For development, just redirect to chat (mock auth is handled server-side)
-    router.push('/chat')
+    // For development, just redirect to the callback URL (mock auth is handled server-side)
+    router.push(next)
   }
 
   return (

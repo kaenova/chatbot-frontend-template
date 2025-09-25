@@ -50,6 +50,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/auth/signin",
+    signOut: "/auth/signout",
   },
   callbacks: {
     async jwt({ token, user, account }) {
@@ -83,6 +84,24 @@ export const authOptions: NextAuthOptions = {
       }
       
       return session
+    },
+    async redirect({ url, baseUrl }) {
+      // Handle callback URL after successful authentication
+      const parsedUrl = new URL(url, baseUrl)
+      const next = parsedUrl.searchParams.get('next')
+      
+      // If there's a next parameter and it's a relative path on the same domain
+      if (next && next.startsWith('/') && !next.startsWith('//')) {
+        return `${baseUrl}${next}`
+      }
+      
+      // If the URL is on the same domain, allow it
+      if (parsedUrl.origin === baseUrl) {
+        return url
+      }
+      
+      // Default redirect to chat page
+      return `${baseUrl}/chat`
     },
   },
 }

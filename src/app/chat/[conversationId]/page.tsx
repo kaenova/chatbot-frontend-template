@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Thread } from "@/components/assistant-ui/thread";
 import { AssistantRuntimeProvider, ThreadHistoryAdapter } from '@assistant-ui/react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useDataStreamRuntime } from '@assistant-ui/react-data-stream';
 import { extractConversationFromHistory } from '@/lib/langgraph-message-conversion';
 
@@ -12,6 +12,7 @@ function ChatPage() {
   const conversationId = params.conversationId as string
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   const HistoryAdapter: ThreadHistoryAdapter = {
 
@@ -33,10 +34,11 @@ function ChatPage() {
         if (!response.ok) {
           if (response.status === 404) {
             // Conversation not found, set error and return empty messages
+            router.push('/not-found')
             setError('Conversation not found')
-            setIsLoadingHistory(false)
             return { messages: [] };
           }
+          setIsLoadingHistory(false)
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
