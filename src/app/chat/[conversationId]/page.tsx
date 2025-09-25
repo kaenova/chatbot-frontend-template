@@ -70,15 +70,7 @@ function ChatPage() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className='h-screen pt-16 md:pt-0'>
-        {isLoadingHistory ? (
-          // Show loading state while fetching conversation history
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="text-gray-600">Loading conversation...</p>
-            </div>
-          </div>
-        ) : error ? (
+        {error ? (
           // Show error state if conversation failed to load
           <div className="h-full flex items-center justify-center">
             <div className="text-center space-y-4 max-w-md">
@@ -94,8 +86,8 @@ function ChatPage() {
             </div>
           </div>
         ) : (
-          // Show main chat interface
-          <Thread />
+          // Show main chat interface with loading skeleton when needed
+          <Thread isLoading={isLoadingHistory} />
         )}
       </div>
     </AssistantRuntimeProvider>

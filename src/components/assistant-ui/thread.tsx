@@ -33,8 +33,13 @@ import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTimeOfDay } from "@/lib/time-utils";
+import { ChatMessageSkeleton } from "@/components/ChatMessageSkeleton";
 
-export const Thread: FC = () => {
+interface ThreadProps {
+  isLoading?: boolean;
+}
+
+export const Thread: FC<ThreadProps> = ({ isLoading = false }) => {
   return (
     <LazyMotion features={domAnimation}>
       <MotionConfig reducedMotion="user">
@@ -45,19 +50,27 @@ export const Thread: FC = () => {
           }}
         >
           <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll px-4">
+            {
+              !isLoading &&
             <ThreadWelcome />
+            }
 
-            <ThreadPrimitive.Messages
-              components={{
-                UserMessage,
-                EditComposer,
-                AssistantMessage,
-              }}
-            />
-            <ThreadPrimitive.If empty={false}>
+            {isLoading ? (
+              <ChatMessageSkeleton count={2} />
+            ) : (
+              <ThreadPrimitive.Messages
+                components={{
+                  UserMessage,
+                  EditComposer,
+                  AssistantMessage,
+                }}
+              />
+            )}
+            
+            <ThreadPrimitive.If empty={isLoading}>
               <div className="aui-thread-viewport-spacer min-h-8 grow" />
             </ThreadPrimitive.If>
-            <Composer />
+            <Composer isDisabled={isLoading} />
           </ThreadPrimitive.Viewport>
         </ThreadPrimitive.Root>
       </MotionConfig>
@@ -202,29 +215,44 @@ const ThreadWelcomeSuggestions: FC = () => {
   );
 };
 
-const Composer: FC = () => {
+interface ComposerProps {
+  isDisabled?: boolean;
+}
+
+const Composer: FC<ComposerProps> = ({ isDisabled = false }) => {
   return (
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
       <ThreadScrollToBottom />
-      <ThreadPrimitive.Empty>
+      {
+        !isDisabled &&
+        <ThreadPrimitive.Empty>
         <ThreadWelcomeSuggestions />
       </ThreadPrimitive.Empty>
-      <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col rounded-3xl border border-border bg-muted px-1 pt-2 shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15">
+      }
+      <ComposerPrimitive.Root className={cn(
+        "aui-composer-root relative flex w-full flex-col rounded-3xl border border-border bg-muted px-1 pt-2 shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15",
+        isDisabled && "opacity-50 pointer-events-none"
+      )}>
         <ComposerAttachments />
         <ComposerPrimitive.Input
-          placeholder="Send a message..."
+          placeholder={isDisabled ? "Loading conversation..." : "Send a message..."}
           className="aui-composer-input mb-1 max-h-32 min-h-16 w-full resize-none bg-transparent px-3.5 pt-1.5 pb-3 text-base outline-none placeholder:text-muted-foreground focus:outline-primary"
           rows={1}
-          autoFocus
+          autoFocus={!isDisabled}
           aria-label="Message input"
+          disabled={isDisabled}
         />
-        <ComposerAction />
+        <ComposerAction isDisabled={isDisabled} />
       </ComposerPrimitive.Root>
     </div>
   );
 };
 
-const ComposerAction: FC = () => {
+interface ComposerActionProps {
+  isDisabled?: boolean;
+}
+
+const ComposerAction: FC<ComposerActionProps> = ({ isDisabled = false }) => {
   return (
     <div className="aui-composer-action-wrapper relative mx-1 mt-2 mb-2 flex items-center justify-between">
       {/* Disable it for now, because we dont support file uploads yet
@@ -240,6 +268,7 @@ const ComposerAction: FC = () => {
             size="icon"
             className="aui-composer-send size-[34px] rounded-full p-1"
             aria-label="Send message"
+            disabled={isDisabled}
           >
             <ArrowUpIcon className="aui-composer-send-icon size-5" />
           </TooltipIconButton>
