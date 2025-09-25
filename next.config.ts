@@ -3,24 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      {
+      { 
         protocol: 'https',
-        hostname: 'images.unsplash.com',
+        hostname: 'www.mii.co.id',
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'www.garudayamatosteel.com',
-        port: '',
-        pathname: '/**',
-      },
-            {
-        protocol: 'https',
-        hostname: 'logodix.com',
-        port: '',
-        pathname: '/**',
-      }
     ],
   },
   eslint: {

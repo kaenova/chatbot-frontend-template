@@ -55,7 +55,7 @@ def call_model(state: AgentState, config = None) -> Dict[str, List[BaseMessage]]
 
     **Important:**  
     - DO NOT perform any data derivation, unit conversion, or transformation outside of explicit use of the Code Interpreter tool.
-    - Before using tools, always says what you are going to do and why.
+    - DO NOT USE TOOLS IMMEDIATELY, INFORM THE USER FIRST IF YOU NEED TO USE A TOOL.
     """
 
     system_msg = SystemMessage(content=system_prompt.strip())

@@ -8,7 +8,7 @@ export const ToolFallback: ToolCallMessagePartComponent = ({
   argsText,
   result,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <div className="aui-tool-fallback-root mb-4 flex w-full flex-col gap-3 rounded-lg border py-3">
       <div className="aui-tool-fallback-header flex items-center gap-2 px-4">

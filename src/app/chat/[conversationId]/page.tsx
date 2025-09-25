@@ -42,11 +42,7 @@ function ChatPage() {
 
         const resMsg = await response.json();
 
-        console.log('Raw conversation data:', resMsg);
-
         const messagesData = extractConversationFromHistory(resMsg);
-
-        console.log(messagesData)
 
         setIsLoadingHistory(false)
         return { messages: messagesData };
@@ -58,10 +54,9 @@ function ChatPage() {
       }
     },
 
-    async append(message) {
+    async append() {
       // The message will be saved automatically by your backend when streaming completes
       // You might want to implement this if you need to save messages immediately
-      console.log('Message appended:', message);
     },
   }
 
