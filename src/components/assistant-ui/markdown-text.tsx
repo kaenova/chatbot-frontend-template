@@ -16,11 +16,38 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 import { cn } from "@/lib/utils";
 import { SyntaxHighlighter } from "./shiki-highlighter";
 
+import { MermaidDiagram } from "@/components/assistant-ui/mermaid-diagram";
+
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+
+
+function normalizeCustomMathTags(input: string): string {
+  return (
+    input
+      // Convert [/math]...[/math] to $$...$$
+      .replace(/\[\/math\]([\s\S]*?)\[\/math\]/g, (_, content) => `$$${content.trim()}$$`)
+      // Convert [/inline]...[/inline] to $...$
+      .replace(/\[\/inline\]([\s\S]*?)\[\/inline\]/g, (_, content) => `$${content.trim()}$`)
+      // Convert \( ... \) to $...$ (inline math) - handles both single and double backslashes
+      .replace(/\\{1,2}\(([\s\S]*?)\\{1,2}\)/g, (_, content) => `$${content.trim()}$`)
+      // Convert \[ ... \] to $$...$$ (block math) - handles both single and double backslashes
+      .replace(/\\{1,2}\[([\s\S]*?)\\{1,2}\]/g, (_, content) => `$$${content.trim()}$$`)
+  );
+}
+
 const MarkdownTextImpl = () => {
   return (
     <MarkdownTextPrimitive
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeKatex]}
+      preprocess={normalizeCustomMathTags}
       className="aui-md"
+      componentsByLanguage={{
+        mermaid: {
+          SyntaxHighlighter: MermaidDiagram 
+        },
+      }}
       components={defaultComponents}
     />
   );

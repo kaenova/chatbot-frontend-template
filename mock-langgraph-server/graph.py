@@ -59,6 +59,11 @@ def call_model(state: AgentState, config = None) -> Dict[str, List[BaseMessage]]
     You can use the code interpreter tool to do calculations, data analysis, and plotting.
     You can use the code interpreter to download files from the web, unzip files, and read files.
 
+    Use the following format for Math expressions:
+    - $...$ for inline math
+    - $$...$$ for display math
+
+
     **Important:**  
     - DO NOT perform any data derivation, unit conversion, or transformation outside of explicit use of the Code Interpreter tool.
     - DO NOT USE TOOLS IMMEDIATELY, INFORM THE USER FIRST IF YOU NEED TO USE A TOOL.

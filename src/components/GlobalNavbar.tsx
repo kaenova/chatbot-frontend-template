@@ -136,7 +136,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isPinned, setIsPinned] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const { getGroupedChatHistory, togglePinChat, deleteChat, isLoading } = useChat()
+  const { getGroupedChatHistory, togglePinChat, deleteChat, isInitialLoading } = useChat()
   const { showConfirmation } = useModal()
   const router = useRouter()
   const pathname = usePathname()
@@ -309,7 +309,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
             {/* Chat History - Scrollable */}
             <div className="flex-1 overflow-y-auto min-h-0">
               <div className="px-4">
-                {isLoading ? (
+                {isInitialLoading ? (
                   <>
                     <ChatSkeleton isMobile={true} count={4} />
                   </>
@@ -423,7 +423,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {/* Chat History - Scrollable */}
         {!isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-4 modern-scrollbar">
-            {isLoading ? (
+            {isInitialLoading ? (
               <>
                 <ChatSkeleton count={4} />
               </>
@@ -444,7 +444,7 @@ export default function GlobalNavbar({ user }: GlobalNavbarProps) {
         {isCollapsed && (
           <div className="flex-1 overflow-y-auto min-h-0 px-2 py-4 my-2 no-scrollbar">
             <div className="space-y-2">
-              {isLoading ? (
+              {isInitialLoading ? (
                 <ChatSkeleton isCollapsed={true} count={8} />
               ) : (
                 <>

@@ -31,9 +31,11 @@ export default function ChatSkeleton({ isCollapsed = false, isMobile = false, co
                 <div className="w-4 h-4 bg-gray-300 rounded flex-shrink-0"></div>
               )}
               <div className="flex items-center space-x-2 flex-1 min-w-0">
-                <div className="flex-1 min-w-0">
-                  <div className="h-4 bg-gray-300 rounded mb-1" style={{ width: `${Math.random() * 40 + 60}%` }}></div>
-                  <div className="h-3 bg-gray-200 rounded" style={{ width: `${Math.random() * 30 + 40}%` }}></div>
+                <div className="flex-1 min-w-0 w-full">
+
+
+                  <div className="h-4 bg-gray-300 rounded mb-1 w-2/3"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/3"></div>
                 </div>
               </div>
             </div>

@@ -27,6 +27,7 @@ interface ChatContextType {
   deleteChat: (chatId: string) => Promise<void>
   loadConversations: () => Promise<void>
   isLoading: boolean
+  isInitialLoading: boolean
   error: string | null
 }
 
@@ -214,6 +215,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const { status } = useSession()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   // Load conversations on mount
@@ -258,6 +260,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       console.error('Load conversations error:', err)
     } finally {
       setIsLoading(false)
+      setIsInitialLoading(false) // Set initial loading to false after first load attempt
     }
   }
 
@@ -317,6 +320,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       deleteChat,
       loadConversations,
       isLoading,
+      isInitialLoading,
       error
     }}>
       {children}
