@@ -47,14 +47,20 @@ def call_model(state: AgentState, config = None) -> Dict[str, List[BaseMessage]]
         Dict containing the updated messages
     """
     messages = state["messages"]
-    
-    # Add system message if provided in config
-    if config and "configurable" in config:
-        configurable = config["configurable"]
-        if "system" in configurable and configurable["system"]:
-            system_msg = SystemMessage(content=configurable["system"])
-            messages = [system_msg] + messages
-    
+
+    system_prompt = """
+    You are a helpful AI assistant. Use the tools below to assist the user.
+
+    If there's any error come back from the tools, try to fix the error then try it again.
+
+    **Important:**  
+    - DO NOT perform any data derivation, unit conversion, or transformation outside of explicit use of the Code Interpreter tool.
+    - Before using tools, always says what you are going to do and why.
+    """
+
+    system_msg = SystemMessage(content=system_prompt.strip())
+    messages = [system_msg] + messages
+        
     # Bind tools to the model
     model_with_tools = model.bind_tools(AVAILABLE_TOOLS)
     response = model_with_tools.invoke(messages)

@@ -83,38 +83,32 @@ async def generate_stream(input_message: str, conversation_id: str):
                     for tool_call in msg.tool_calls:
                         tool_call_id = tool_call.get('id', str(uuid.uuid4()))
                         tool_name = tool_call.get('name', '')
-                        tool_args = tool_call.get('args', {})
 
                         if tool_name == "":
                             continue
+
+                        tool_calls_by_idx[len(tool_calls_by_idx)] = tool_call_id
+                        tool_calls[tool_call_id] = {"name": tool_name, "args": ""}
                         
                         # Send StartToolCall (b:)
                         yield f"b:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name})}\n"
                         
-                        # Send ToolCall (9:) with complete args
-                        yield f"9:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name, 'args': tool_args})}\n"
+                        # # Send ToolCall (9:) with complete args
+                        # yield f"9:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name, 'args': tool_args})}\n"
                 
                 # Handle streaming tool call chunks
-                elif hasattr(msg, 'tool_call_chunks') and msg.tool_call_chunks:
+                if hasattr(msg, 'tool_call_chunks') and msg.tool_call_chunks:
                     for chunk in msg.tool_call_chunks:
-                        tool_call_id = chunk.get("id", str(uuid.uuid4()))
                         tool_name = chunk.get("name", "")
                         args_chunk = chunk.get("args", "")
                         chunk_index = chunk.get("index", 0)
-                        if tool_name == "":
-                            continue
-                        
-                        if chunk_index not in tool_calls_by_idx:
-                            # First chunk for this tool call - send StartToolCall (b:)
-                            tool_calls_by_idx[chunk_index] = tool_call_id
-                            tool_calls[tool_call_id] = {"name": tool_name, "args": ""}
-                            
-                            yield f"b:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name})}\n"
-                        
+                        tool_call_id = tool_calls_by_idx.get(chunk_index, -1)
+
                         # Accumulate args and send ToolCallArgsTextDelta (c:)
-                        if args_chunk:
+                        if tool_call_id != -1 and args_chunk:
                             tool_calls[tool_call_id]["args"] += args_chunk
                             yield f"c:{json.dumps({'toolCallId': tool_call_id, 'argsTextDelta': args_chunk})}\n"
+                        
 
         # Send FinishMessage (d:) with usage stats
         yield f"d:{json.dumps({'finishReason': 'stop', 'usage': {'promptTokens': token_count, 'completionTokens': token_count}})}\n"

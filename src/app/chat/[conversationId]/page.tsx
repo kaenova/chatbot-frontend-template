@@ -14,6 +14,8 @@ function ChatPage() {
   const [error, setError] = useState<string | null>(null)
 
   const HistoryAdapter: ThreadHistoryAdapter = {
+
+    // @ts-expect-error // conversationId might be undefined during initial render
     async load() {
       try {
         if (!conversationId) {
