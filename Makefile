@@ -48,7 +48,8 @@ dev:
 # Start LangGraph FastAPI server
 dev-graph-backend:
 	@echo "🤖 Starting LangGraph FastAPI server..."
-	cd mock-langgraph-server && uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+	@echo "This is not reloadable. Restart this command to apply changes."
+	cd mock-langgraph-server && uv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 # Build frontend for production
 build-frontend:

@@ -50,14 +50,14 @@ export interface NavigationItem {
 
 // Default configuration - Customize these values to change your site branding
 export const siteConfig: SiteConfig = {
-  name: "SMBCI Chat",
-  title: "SMBCI Chat",
-  description: "A ChatGPT-like interface built with Next.js and NextAuth",
+  name: "MII Chat",
+  title: "MII Chat - Your AI Assistant",
+  description: "A ChatGPT-like AI assistant built with Next.js, React, and Assistant-UI. Supported by Mitra Integrasi Infromatika.",
   url: "https://chatgpt-clone.com", // Update with your actual domain
   keywords: ["chatgpt", "ai", "artificial intelligence", "chat", "assistant", "nextjs", "react"],
-  favicon: "/favicon.ico",
+  favicon: "https://www.mii.co.id/cfind/source/images/logo.png",
   logo: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Logo_SMBC-Indonesia.svg", // Change this to your logo path
+    src: "https://www.mii.co.id/cfind/source/images/logo.png", // Change this to your logo path
     alt: "ChatGPT Clone Logo",
     width: 118,
     height: 24
@@ -157,7 +157,7 @@ export const siteConfig: SiteConfig = {
       afternoon: "Good afternoon",
       evening: "Good evening"
     },
-    welcomeMessage: "I'm your AI assistant. Start a conversation by typing a message below or try one of these suggestions:",
+    welcomeMessage: "I'm your AI assistant. Start a conversation by typing a message below or try one of these suggestions",
     messageLimit: 4, // Number of messages to fetch per request, must even number
     recommendationQuestions: [
       "What are the latest trends in web development?",

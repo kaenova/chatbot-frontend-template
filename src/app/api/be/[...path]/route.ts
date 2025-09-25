@@ -104,8 +104,6 @@ async function handleProxyRequest(
       }
     }
 
-    console.log(body)
-
     // Make the request to the backend
     const response = await fetch(finalUrl, {
       method,

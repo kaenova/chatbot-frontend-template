@@ -5,21 +5,7 @@ import { Thread } from "@/components/assistant-ui/thread";
 import { AssistantRuntimeProvider, ThreadHistoryAdapter } from '@assistant-ui/react';
 import { useParams } from 'next/navigation';
 import { useDataStreamRuntime } from '@assistant-ui/react-data-stream';
-import {ThreadMessage} from '@assistant-ui/react'
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-interface BackendMessage {
-  message: {
-    id: string
-    role: 'user' | 'assistant'
-    content: string | { type: string; [key: string]: any }[]
-    createdAt: string // ISO date string
-    status?: { type: string; reason: string } | null
-    metadata: { custom: Record<string, any> },
-    attchments?: any[] // Only for user messages
-  },
-  parentId: string | null
-}
+import { extractConversationFromHistory } from '@/lib/langgraph-message-conversion';
 
 function ChatPage() {
   const params = useParams()
@@ -28,6 +14,8 @@ function ChatPage() {
   const [error, setError] = useState<string | null>(null)
 
   const HistoryAdapter: ThreadHistoryAdapter = {
+
+    // @ts-expect-error // conversationId might be undefined during initial render
     async load() {
       try {
         if (!conversationId) {
@@ -52,44 +40,12 @@ function ChatPage() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const resMsg: BackendMessage[] = await response.json();
+        const resMsg = await response.json();
 
-        function mapBackendToThreadMessage(msg: BackendMessage): {message: ThreadMessage, parentId: string | null} {
-          
-          const adjustedContent: { type: string; [key: string]: any }[] = []
-          if (typeof msg.message.content === 'string') {
-            adjustedContent.push({ type: 'text', text: msg.message.content })
-          }
-          else if (Array.isArray(msg.message.content)) {
-            for (const contentItem of msg.message.content) {
-              if (contentItem.type === 'text' && typeof contentItem.text === 'string') {
-                adjustedContent.push({ type: 'text', text: contentItem.text })
-              }
-            }
-          }
+        const messagesData = extractConversationFromHistory(resMsg);
 
-          return {
-            parentId: msg.parentId,
-            message: {
-              id: msg.message.id,
-              role: msg.message.role,
-              // @ts-expect-error // The type definition in assistant-ui seems incorrect for content, currentluy only support string text
-              content: adjustedContent,
-              createdAt: new Date(msg.message.createdAt),
-              metadata: { custom: {} },
-              ...(msg.message.role === 'user' ? { attachments: [] } : {}),
-              ...(msg.message.role === 'assistant' ? { status: { type: 'complete', reason: 'stop' } } : {}),
-            }
-          }
-        
-        }
-        
-        // Convert backend message format to assistant-ui format
-        const messages = resMsg
-          .map((d) => mapBackendToThreadMessage(d));
-        console.log(messages)
         setIsLoadingHistory(false)
-        return { messages: messages };
+        return { messages: messagesData };
       } catch (error) {
         console.error('Failed to load conversation history:', error);
         setError('Failed to load conversation history')
@@ -98,10 +54,9 @@ function ChatPage() {
       }
     },
 
-    async append(message) {
+    async append() {
       // The message will be saved automatically by your backend when streaming completes
       // You might want to implement this if you need to save messages immediately
-      console.log('Message appended:', message);
     },
   }
 
@@ -115,15 +70,7 @@ function ChatPage() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className='h-screen pt-16 md:pt-0'>
-        {isLoadingHistory ? (
-          // Show loading state while fetching conversation history
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="text-gray-600">Loading conversation...</p>
-            </div>
-          </div>
-        ) : error ? (
+        {error ? (
           // Show error state if conversation failed to load
           <div className="h-full flex items-center justify-center">
             <div className="text-center space-y-4 max-w-md">
@@ -132,15 +79,15 @@ function ChatPage() {
               <p className="text-gray-600">{error}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-primary/85 hover:bg-primary text-white rounded-lg transition-colors"
               >
                 Try Again
               </button>
             </div>
           </div>
         ) : (
-          // Show main chat interface
-          <Thread />
+          // Show main chat interface with loading skeleton when needed
+          <Thread isLoading={isLoadingHistory} />
         )}
       </div>
     </AssistantRuntimeProvider>

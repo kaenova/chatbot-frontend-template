@@ -12,6 +12,7 @@ import time
 
 from typing import Annotated
 from pydantic import BaseModel
+from langchain_core.load import dumps
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends, Header, HTTPException
@@ -82,38 +83,32 @@ async def generate_stream(input_message: str, conversation_id: str):
                     for tool_call in msg.tool_calls:
                         tool_call_id = tool_call.get('id', str(uuid.uuid4()))
                         tool_name = tool_call.get('name', '')
-                        tool_args = tool_call.get('args', {})
 
                         if tool_name == "":
                             continue
+
+                        tool_calls_by_idx[len(tool_calls_by_idx)] = tool_call_id
+                        tool_calls[tool_call_id] = {"name": tool_name, "args": ""}
                         
                         # Send StartToolCall (b:)
                         yield f"b:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name})}\n"
                         
-                        # Send ToolCall (9:) with complete args
-                        yield f"9:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name, 'args': tool_args})}\n"
+                        # # Send ToolCall (9:) with complete args
+                        # yield f"9:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name, 'args': tool_args})}\n"
                 
                 # Handle streaming tool call chunks
-                elif hasattr(msg, 'tool_call_chunks') and msg.tool_call_chunks:
+                if hasattr(msg, 'tool_call_chunks') and msg.tool_call_chunks:
                     for chunk in msg.tool_call_chunks:
-                        tool_call_id = chunk.get("id", str(uuid.uuid4()))
                         tool_name = chunk.get("name", "")
                         args_chunk = chunk.get("args", "")
                         chunk_index = chunk.get("index", 0)
-                        if tool_name == "":
-                            continue
-                        
-                        if chunk_index not in tool_calls_by_idx:
-                            # First chunk for this tool call - send StartToolCall (b:)
-                            tool_calls_by_idx[chunk_index] = tool_call_id
-                            tool_calls[tool_call_id] = {"name": tool_name, "args": ""}
-                            
-                            yield f"b:{json.dumps({'toolCallId': tool_call_id, 'toolName': tool_name})}\n"
-                        
+                        tool_call_id = tool_calls_by_idx.get(chunk_index, -1)
+
                         # Accumulate args and send ToolCallArgsTextDelta (c:)
-                        if args_chunk:
+                        if tool_call_id != -1 and args_chunk:
                             tool_calls[tool_call_id]["args"] += args_chunk
                             yield f"c:{json.dumps({'toolCallId': tool_call_id, 'argsTextDelta': args_chunk})}\n"
+                        
 
         # Send FinishMessage (d:) with usage stats
         yield f"d:{json.dumps({'finishReason': 'stop', 'usage': {'promptTokens': token_count, 'completionTokens': token_count}})}\n"
@@ -228,47 +223,12 @@ def get_chat_history(_: Annotated[str, Depends(get_authenticated_user)], userid:
     # Fetch chat history for the conversation from LangGraph state
     try:
         # Get the conversation state from the checkpointer
-        state = graph.get_state(config={"configurable": {"thread_id": conversation_id}})
+        states_generator = graph.get_state_history(config={"configurable": {"thread_id": conversation_id}})
+        states = list(states_generator)
+
+        json_dumps = dumps(states)
         
-        # Extract messages from the state
-        messages = state.values.get("messages", []) if state.values else []
-        
-        # Convert to the format expected by assistant-ui
-        chat_history = []
-        msg_id = 0
-        for message in messages:
-            parent_id = f"msg_{msg_id-1}" if msg_id > 0 else None
-            if isinstance(message, HumanMessage):
-                chat_history.append({
-                    "message": {
-                        "id": f"msg_{msg_id}",
-                        "role": "user",
-                        "content": message.content,
-                        "createdAt": int(message.additional_kwargs.get("timestamp", 0)) or int(time.time()),
-                        "status": None,
-                        "metadata": {},
-                        "attachments": []
-                    },
-                    "parentId": parent_id }
-                )
-                msg_id += 1
-            elif isinstance(message, AIMessage):
-                if message.content is None or message.content.strip() == "":
-                    continue
-                chat_history.append({
-                    "message": {
-                        "id": f"msg_{msg_id}",
-                        "role": "assistant",
-                        "content": message.content,
-                        "createdAt": int(message.additional_kwargs.get("timestamp", 0)) or int(time.time()),
-                        "status": None,
-                        "metadata": {},
-                    },
-                    "parentId": parent_id }
-                )
-                msg_id += 1
-        
-        return chat_history
+        return json.loads(json_dumps)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch chat history: {str(e)}")

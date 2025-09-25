@@ -47,14 +47,31 @@ def call_model(state: AgentState, config = None) -> Dict[str, List[BaseMessage]]
         Dict containing the updated messages
     """
     messages = state["messages"]
-    
-    # Add system message if provided in config
-    if config and "configurable" in config:
-        configurable = config["configurable"]
-        if "system" in configurable and configurable["system"]:
-            system_msg = SystemMessage(content=configurable["system"])
-            messages = [system_msg] + messages
-    
+
+    system_prompt = """
+    You are a helpful AI assistant. Use the tools below to assist the user.
+
+    If there's any error come back from the tools, try to fix the error then try it again.
+
+    Try to interactively combine multiple tools to answer the user's question.
+    You can browse the web to find relevant information or url, then scrape using the python tool.
+    You can also use the python tool to analyze data, create plots, or do calculations.
+    You can use the code interpreter tool to do calculations, data analysis, and plotting.
+    You can use the code interpreter to download files from the web, unzip files, and read files.
+
+    Use the following format for Math expressions:
+    - $...$ for inline math
+    - $$...$$ for display math
+
+
+    **Important:**  
+    - DO NOT perform any data derivation, unit conversion, or transformation outside of explicit use of the Code Interpreter tool.
+    - DO NOT USE TOOLS IMMEDIATELY, INFORM THE USER FIRST IF YOU NEED TO USE A TOOL.
+    """
+
+    system_msg = SystemMessage(content=system_prompt.strip())
+    messages = [system_msg] + messages
+        
     # Bind tools to the model
     model_with_tools = model.bind_tools(AVAILABLE_TOOLS)
     response = model_with_tools.invoke(messages)
