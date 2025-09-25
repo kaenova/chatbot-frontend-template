@@ -5,21 +5,7 @@ import { Thread } from "@/components/assistant-ui/thread";
 import { AssistantRuntimeProvider, ThreadHistoryAdapter } from '@assistant-ui/react';
 import { useParams } from 'next/navigation';
 import { useDataStreamRuntime } from '@assistant-ui/react-data-stream';
-import {ThreadMessage} from '@assistant-ui/react'
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-interface BackendMessage {
-  message: {
-    id: string
-    role: 'user' | 'assistant'
-    content: string | { type: string; [key: string]: any }[]
-    createdAt: string // ISO date string
-    status?: { type: string; reason: string } | null
-    metadata: { custom: Record<string, any> },
-    attchments?: any[] // Only for user messages
-  },
-  parentId: string | null
-}
+import { extractConversationFromHistory } from '@/lib/langgraph-message-conversion';
 
 function ChatPage() {
   const params = useParams()
@@ -52,44 +38,16 @@ function ChatPage() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const resMsg: BackendMessage[] = await response.json();
+        const resMsg = await response.json();
 
-        function mapBackendToThreadMessage(msg: BackendMessage): {message: ThreadMessage, parentId: string | null} {
-          
-          const adjustedContent: { type: string; [key: string]: any }[] = []
-          if (typeof msg.message.content === 'string') {
-            adjustedContent.push({ type: 'text', text: msg.message.content })
-          }
-          else if (Array.isArray(msg.message.content)) {
-            for (const contentItem of msg.message.content) {
-              if (contentItem.type === 'text' && typeof contentItem.text === 'string') {
-                adjustedContent.push({ type: 'text', text: contentItem.text })
-              }
-            }
-          }
+        console.log('Raw conversation data:', resMsg);
 
-          return {
-            parentId: msg.parentId,
-            message: {
-              id: msg.message.id,
-              role: msg.message.role,
-              // @ts-expect-error // The type definition in assistant-ui seems incorrect for content, currentluy only support string text
-              content: adjustedContent,
-              createdAt: new Date(msg.message.createdAt),
-              metadata: { custom: {} },
-              ...(msg.message.role === 'user' ? { attachments: [] } : {}),
-              ...(msg.message.role === 'assistant' ? { status: { type: 'complete', reason: 'stop' } } : {}),
-            }
-          }
-        
-        }
-        
-        // Convert backend message format to assistant-ui format
-        const messages = resMsg
-          .map((d) => mapBackendToThreadMessage(d));
-        console.log(messages)
+        const messagesData = extractConversationFromHistory(resMsg);
+
+        console.log(messagesData)
+
         setIsLoadingHistory(false)
-        return { messages: messages };
+        return { messages: messagesData };
       } catch (error) {
         console.error('Failed to load conversation history:', error);
         setError('Failed to load conversation history')

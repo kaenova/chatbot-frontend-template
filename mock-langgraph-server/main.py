@@ -12,6 +12,7 @@ import time
 
 from typing import Annotated
 from pydantic import BaseModel
+from langchain_core.load import dumps
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends, Header, HTTPException
@@ -228,47 +229,12 @@ def get_chat_history(_: Annotated[str, Depends(get_authenticated_user)], userid:
     # Fetch chat history for the conversation from LangGraph state
     try:
         # Get the conversation state from the checkpointer
-        state = graph.get_state(config={"configurable": {"thread_id": conversation_id}})
+        states_generator = graph.get_state_history(config={"configurable": {"thread_id": conversation_id}})
+        states = list(states_generator)
+
+        json_dumps = dumps(states)
         
-        # Extract messages from the state
-        messages = state.values.get("messages", []) if state.values else []
-        
-        # Convert to the format expected by assistant-ui
-        chat_history = []
-        msg_id = 0
-        for message in messages:
-            parent_id = f"msg_{msg_id-1}" if msg_id > 0 else None
-            if isinstance(message, HumanMessage):
-                chat_history.append({
-                    "message": {
-                        "id": f"msg_{msg_id}",
-                        "role": "user",
-                        "content": message.content,
-                        "createdAt": int(message.additional_kwargs.get("timestamp", 0)) or int(time.time()),
-                        "status": None,
-                        "metadata": {},
-                        "attachments": []
-                    },
-                    "parentId": parent_id }
-                )
-                msg_id += 1
-            elif isinstance(message, AIMessage):
-                if message.content is None or message.content.strip() == "":
-                    continue
-                chat_history.append({
-                    "message": {
-                        "id": f"msg_{msg_id}",
-                        "role": "assistant",
-                        "content": message.content,
-                        "createdAt": int(message.additional_kwargs.get("timestamp", 0)) or int(time.time()),
-                        "status": None,
-                        "metadata": {},
-                    },
-                    "parentId": parent_id }
-                )
-                msg_id += 1
-        
-        return chat_history
+        return json.loads(json_dumps)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch chat history: {str(e)}")
