@@ -31,6 +31,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
+import { getSiteConfig } from "@/lib/site-config";
+import { getTimeOfDay } from "@/lib/time-utils";
 
 export const Thread: FC = () => {
   return (
@@ -78,6 +80,10 @@ const ThreadScrollToBottom: FC = () => {
 };
 
 const ThreadWelcome: FC = () => {
+
+  const config = getSiteConfig()
+  const time = getTimeOfDay()
+
   return (
     <ThreadPrimitive.Empty>
       <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-[var(--thread-max-width)] flex-grow flex-col">
@@ -87,9 +93,9 @@ const ThreadWelcome: FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="aui-thread-welcome-message-motion-1 text-2xl font-semibold"
+              className="aui-thread-welcome-message-motion-1 text-2xl font-semibold text-primary"
             >
-              Hello there!
+              {config.chat.greeting[time]}
             </m.div>
             <m.div
               initial={{ opacity: 0, y: 10 }}
@@ -98,7 +104,7 @@ const ThreadWelcome: FC = () => {
               transition={{ delay: 0.1 }}
               className="aui-thread-welcome-message-motion-2 text-2xl text-muted-foreground/65"
             >
-              How can I help you today?
+              {config.chat.welcomeMessage}
             </m.div>
           </div>
         </div>
@@ -108,9 +114,40 @@ const ThreadWelcome: FC = () => {
 };
 
 const ThreadWelcomeSuggestions: FC = () => {
+
+  const config = getSiteConfig()
+
   return (
     <div className="aui-thread-welcome-suggestions grid w-full gap-2 @md:grid-cols-2">
-      {[
+
+      {config.chat.recommendationQuestions.slice(0,4).map((suggestedAction, index) => (
+        <m.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ delay: 0.05 * index }}
+          key={`suggested-action-${suggestedAction}-${index}`}
+          className="aui-thread-welcome-suggestion-display [&:nth-child(n+3)]:hidden @md:[&:nth-child(n+3)]:block"
+        >
+          <ThreadPrimitive.Suggestion
+            prompt={suggestedAction}
+            method="replace"
+            autoSend
+            asChild
+          >
+            <Button
+              variant="ghost"
+              className="aui-thread-welcome-suggestion  w-full h-full flex-1 flex-wrap items-start justify-start gap-1 rounded-3xl border px-5 py-4 text-left text-sm @md:flex-col dark:hover:bg-accent/60"
+              aria-label={suggestedAction}
+            >
+              <span className="aui-thread-welcome-suggestion-text-1 font-medium text-primary"> {suggestedAction.split(" ")[0]}</span>  
+              <span className="aui-thread-welcome-suggestion-text-2 text-muted-foreground text-wrap text-ellipsis"> {suggestedAction.split(" ").slice(1).join(" ")}</span>
+            </Button>
+          </ThreadPrimitive.Suggestion>
+        </m.div>
+      ))}
+
+      {/* {[
         {
           title: "What's the weather",
           label: "in San Francisco?",
@@ -160,7 +197,7 @@ const ThreadWelcomeSuggestions: FC = () => {
             </Button>
           </ThreadPrimitive.Suggestion>
         </m.div>
-      ))}
+      ))} */}
     </div>
   );
 };
