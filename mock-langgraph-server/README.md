@@ -10,6 +10,11 @@ A real-time Azure inference API built with FastAPI, LangGraph, and Azure OpenAI.
 - **Tool Support**: Includes a sample tool for getting current time
 - **SQLite Checkpointer**: Persistent conversation state with SQLite
 - **Conversation Metadata**: SQLite database for managing conversation metadata (pinning, creation time, user association)
+- **File Indexing System**: Complete file upload, processing, and vector search using Azure services:
+  - Azure Blob Storage for file storage
+  - Azure Document Intelligence for content extraction
+  - Azure OpenAI for embedding generation
+  - Azure AI Search for vector database
 
 ## Setup
 
@@ -36,8 +41,9 @@ uv sync
 cp env.sample .env
 ```
 
-4. Edit `.env` with your Azure OpenAI credentials and authentication settings:
+4. Edit `.env` with your Azure credentials and authentication settings:
 ```
+# Azure OpenAI
 AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com/
 AZURE_OPENAI_API_KEY=your-api-key-here
 AZURE_OPENAI_DEPLOYMENT_NAME=your-deployment-name
@@ -46,6 +52,25 @@ AZURE_OPENAI_API_VERSION=2024-02-01
 # Authentication (matches frontend .env.local)
 BACKEND_AUTH_USERNAME=apiuser
 BACKEND_AUTH_PASSWORD=securepass123
+
+# Azure Services for File Indexing (optional)
+AZURE_STORAGE_CONNECTION_STRING=your-storage-connection-string
+AZURE_STORAGE_CONTAINER_NAME=file-uploads
+AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=your-doc-intelligence-endpoint
+AZURE_DOCUMENT_INTELLIGENCE_API_KEY=your-doc-intelligence-key
+AZURE_SEARCH_ENDPOINT=your-search-endpoint
+AZURE_SEARCH_API_KEY=your-search-key
+AZURE_SEARCH_INDEX_NAME=file-embeddings
+```
+
+5. **(Optional)** Install Azure dependencies for file indexing:
+```bash
+python install_azure_deps.py
+```
+
+6. **(Optional)** Test your Azure configuration:
+```bash
+python test_file_indexing.py
 ```
 
 ### Running the Server
@@ -70,6 +95,14 @@ All endpoints require HTTP Basic Authentication.
 - Streaming chat completions with tool support
 - **Authentication**: Required (HTTP Basic Auth)
 
+### File Indexing (Optional)
+- **POST** `/api/v1/files` - Upload and index files
+- **GET** `/api/v1/files` - List user files
+- **GET** `/api/v1/files/{file_id}` - Get file status
+- **DELETE** `/api/v1/files/{file_id}` - Delete file
+- **POST** `/api/v1/files/{file_id}/reindex` - Re-index file
+- **Authentication**: Required (HTTP Basic Auth)
+
 ### Health Check
 - **GET** `/health`
 - Returns server health status
@@ -84,15 +117,28 @@ All endpoints require HTTP Basic Authentication.
 
 ```
 mock-langgraph-server/
-├── main.py                 # FastAPI server and routes
-├── graph.py               # LangGraph agent implementation
-├── model.py               # Azure OpenAI model configuration
-├── tools.py               # Available tools for the agent
-├── assistant_stream.py    # Streaming utilities
-├── auth.py                # HTTP Basic Authentication
-├── .env                   # Environment variables
-├── env.sample            # Environment template
-└── README.md             # This file
+├── main.py                       # FastAPI server and routes
+├── database.py                   # Database models and operations
+├── auth.py                       # HTTP Basic Authentication
+├── .env                         # Environment variables
+├── env.sample                   # Environment template
+├── install_azure_deps.py        # Azure dependencies installer
+├── test_file_indexing.py        # Configuration test script
+├── FILE_INDEXING_README.md      # File indexing documentation
+├── agent/
+│   ├── graph.py                 # LangGraph agent implementation
+│   ├── model.py                 # Azure OpenAI model configuration
+│   └── tools.py                 # Available tools for the agent
+├── orchestration/
+│   ├── __init__.py              # Orchestrator initialization
+│   └── file_indexing.py         # File processing workflow
+├── routes/
+│   ├── chat_conversation.py     # Chat endpoints
+│   └── file_indexing.py         # File indexing endpoints
+├── utils/
+│   ├── stream_protocol.py       # Streaming utilities
+│   └── uuid.py                  # UUID utilities
+└── README.md                    # This file
 ```
 
 ## Tools

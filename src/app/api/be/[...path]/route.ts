@@ -65,50 +65,30 @@ async function handleProxyRequest(
       : fullBackendUrl
 
     // Prepare headers - start with backend auth headers
-    const headers = getBackendAuthHeaders({
-      'Content-Type': request.headers.get('content-type') || 'application/json',
-    })
+    const headers = getBackendAuthHeaders()
 
     // Add UserID header if user is authenticated
     if (session?.user?.id) {
       headers['UserID'] = session.user.id
     }
 
-    // Copy relevant headers from the original request
-    const headersToForward = [
-      'accept',
-      'accept-language',
-      'cache-control',
-      'pragma',
-      'sec-fetch-dest',
-      'sec-fetch-mode',
-      'sec-fetch-site',
-      'user-agent',
-      'x-requested-with',
-    ]
-
-    headersToForward.forEach(headerName => {
+    [...(request.headers.keys())].forEach(headerName => {
       const headerValue = request.headers.get(headerName)
       if (headerValue) {
         headers[headerName] = headerValue
       }
     })
 
-    // Prepare request body
-    let body: string | undefined
+    let body = undefined
     if (['POST', 'PUT', 'PATCH'].includes(method)) {
-      try {
-        body = await request.text()
-      } catch (error) {
-        console.error('Error reading request body:', error)
-      }
+      body = await request.arrayBuffer()
     }
 
     // Make the request to the backend
     const response = await fetch(finalUrl, {
-      method,
-      headers,
-      body,
+      method: method,
+      headers: headers,
+      body: body
     })
 
     // Create response headers, excluding some that shouldn't be forwarded
