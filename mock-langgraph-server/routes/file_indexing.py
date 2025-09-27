@@ -86,10 +86,6 @@ async def upload_file(
         
         file_content = await file.read()
 
-        # Debugging, save to current directory
-        with open(file.filename, "wb") as debug_file:
-            debug_file.write(file_content)
-
         blob_client.upload_blob(file_content, overwrite=True)
         
         # Create file metadata in database
