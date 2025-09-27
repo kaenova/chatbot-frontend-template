@@ -45,6 +45,7 @@
     "react-shiki": "^0.8.0",
     "react-syntax-highlighter": "^15.6.6",
     "rehype-katex": "^7.0.1",
+    "rehype-raw": "^7.0.0",
     "remark-code-blocks": "^2.0.1",
     "remark-code-extra": "^1.0.1",
     "remark-code-title": "^0.2.5",
