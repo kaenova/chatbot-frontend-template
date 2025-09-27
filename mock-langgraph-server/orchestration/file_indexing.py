@@ -25,7 +25,9 @@ from azure.search.documents.indexes.models import (
     SemanticPrioritizedFields,
     SemanticField,
     SearchableField,
-    SimpleField
+    SimpleField,
+    AzureOpenAIVectorizer,
+    AzureOpenAIVectorizerParameters,
 )
 from azure.ai.documentintelligence.models import AnalyzeDocumentRequest, AnalyzeResult
 from openai import AzureOpenAI
@@ -87,7 +89,7 @@ def ensure_search_index_v1() -> bool:
         
         # Define the search index schema
         fields = [
-            SimpleField(name="id", type=SearchFieldDataType.String, key=True),
+            SimpleField(name="id", type=SearchFieldDataType.String, key=True, filterable=True),
             SearchableField(name="content", type=SearchFieldDataType.String),
             SearchableField(name="file_id", type=SearchFieldDataType.String, filterable=True),
             SearchableField(name="filename", type=SearchFieldDataType.String, filterable=True),
@@ -104,15 +106,28 @@ def ensure_search_index_v1() -> bool:
         
         # Configure vector search
         vector_search = VectorSearch(
+            algorithms=[
+                HnswAlgorithmConfiguration(name="my-hnsw")
+            ],
+            vectorizers=[  
+                AzureOpenAIVectorizer(  
+                    vectorizer_name="openai-vectorizer",  
+                    kind="azureOpenAI",  
+                    parameters=AzureOpenAIVectorizerParameters(  
+                        resource_url=os.getenv("AZURE_OPENAI_ENDPOINT"),  
+                        deployment_name=os.getenv("AZURE_OPENAI_API_KEY"),
+                        model_name="text-embedding-3-small"
+                    ),
+                ),  
+            ], #
             profiles=[
                 VectorSearchProfile(
                     name="my-vector-config",
-                    algorithm_configuration_name="my-hnsw"
+                    algorithm_configuration_name="my-hnsw",
+                    vectorizer_name="openai-vectorizer",
                 )
             ],
-            algorithms=[
-                HnswAlgorithmConfiguration(name="my-hnsw")
-            ]
+            
         )
         
         # Configure semantic search
