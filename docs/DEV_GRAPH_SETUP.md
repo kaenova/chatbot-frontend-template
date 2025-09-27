@@ -6,8 +6,8 @@
 - **Status**: ✅ Already configured correctly
 - **Port**: 8000 (configured in both `.env` and `main.py`)
 - **Configuration files**:
-  - `mock-langgraph-server/.env`: `PORT=8000`
-  - `mock-langgraph-server/main.py`: `port = int(os.getenv("PORT", 8000))`
+  - `mock-backend/.env`: `PORT=8000`
+  - `mock-backend/main.py`: `port = int(os.getenv("PORT", 8000))`
 
 ### 2. Makefile Updates
 - **New command**: `make dev-graph`
@@ -55,7 +55,7 @@ The `dev-graph` command uses Make's parallel execution (`-j2`) to run:
 ### Virtual Environment Handling
 - The LangGraph server runs in its own `.venv` managed by UV
 - No conflicts with the main project dependencies
-- Isolated Python environment in `mock-langgraph-server/`
+- Isolated Python environment in `mock-backend/`
 
 ### Process Management
 - Both services run as background processes
@@ -67,7 +67,7 @@ The `dev-graph` command uses Make's parallel execution (`-j2`) to run:
 1. **Setup LangGraph environment** (one-time):
    ```bash
    make langgraph-setup
-   # Edit mock-langgraph-server/.env with your Azure OpenAI credentials
+   # Edit mock-backend/.env with your Azure OpenAI credentials
    ```
 
 2. **Install dependencies** (one-time):

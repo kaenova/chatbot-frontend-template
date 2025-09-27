@@ -2,7 +2,7 @@ import json
 
 from utils.uuid import generate_uuid
 from langchain_core.load import dumps
-from auth import get_authenticated_user
+from lib.auth import get_authenticated_user
 from utils.stream_protocol import generate_stream
 
 from typing import Annotated
@@ -11,7 +11,7 @@ from fastapi.responses import StreamingResponse
 from fastapi import APIRouter, Depends, Header, HTTPException
 
 from agent.graph import graph
-from database import db_manager
+from lib.database import db_manager
 
 class ChatRequest(BaseModel):
     messages: list

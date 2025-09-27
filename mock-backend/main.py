@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends
 
 # Utils and modules
-from auth import get_authenticated_user
+from lib.auth import get_authenticated_user
 
 # Run orchestration
 from orchestration import get_orchestrator

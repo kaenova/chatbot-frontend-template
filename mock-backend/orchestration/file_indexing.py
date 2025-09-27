@@ -3,7 +3,6 @@ A workflow to index and chunk a file using Azure services.
 """
 
 import os
-import uuid
 import logging
 from typing import List, Dict, Any, Optional
 from py_orchestrate import activity, workflow
@@ -31,7 +30,8 @@ from azure.search.documents.indexes.models import (
 )
 from azure.ai.documentintelligence.models import AnalyzeDocumentRequest, AnalyzeResult
 from openai import AzureOpenAI
-from database import db_manager
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from lib.database import db_manager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -156,6 +156,32 @@ def ensure_search_index_v1() -> bool:
         logger.error(f"Failed to ensure search index: {str(e)}")
         return False
 
+def extract_markdown_from_result(result: AnalyzeResult) -> str:
+    """Extract markdown from Document Intelligence result using prebuilt-layout."""
+    markdown_parts = []
+    for page in result.pages or []:
+        page_content = []
+        # Add paragraphs
+        for para in page.paragraphs or []:
+            page_content.append(para.content)
+        # Add tables as markdown
+        for table in page.tables or []:
+            if table.row_count > 0 and table.column_count > 0:
+                cells = {(cell.row_index, cell.column_index): cell.content or "" for cell in table.cells}
+                table_md = []
+                for r in range(table.row_count):
+                    row = [cells.get((r, c), "") for c in range(table.column_count)]
+                    row_md = "| " + " | ".join(row) + " |"
+                    table_md.append(row_md)
+                    if r == 0:
+                        sep = "| " + " | ".join(["---"] * table.column_count) + " |"
+                        table_md.insert(1, sep)
+                page_content.append("\n".join(table_md))
+        if page_content:
+            markdown_parts.append("\n\n".join(page_content))
+    return "\n\n".join(markdown_parts)
+
+
 @activity("ocr_file_v1")
 def ocr_file_v1(file_id: str) -> str:
     """Extract content from file using Azure Document Intelligence."""
@@ -180,16 +206,15 @@ def ocr_file_v1(file_id: str) -> str:
         
         # Use Document Intelligence to extract content
         poller = doc_intelligence.begin_analyze_document(
-            "prebuilt-read",  # Use prebuilt read model for text extraction
+            "prebuilt-layout",  # Use prebuilt layout model for structured extraction
             AnalyzeDocumentRequest(bytes_source=file_content),
+            output_content_format="markdown"
         )
         
         result = poller.result()
         
-        # Extract text content
-        content = ""
-        if result.content:
-            content = result.content
+        # Extract markdown content
+        content = result.content
         
         logger.info(f"Successfully extracted content from file {file_id}, length: {len(content)}")
         return content
@@ -200,34 +225,17 @@ def ocr_file_v1(file_id: str) -> str:
 
 @activity("chunk_file_v1")
 def chunk_file_v1(content: str) -> List[str]:
-    """Chunk the file content into smaller pieces for embedding."""
+    """Chunk the file content into smaller pieces for embedding using LangChain RecursiveCharacterTextSplitter."""
     try:
-        # Simple chunking strategy - can be enhanced with more sophisticated methods
-        chunk_size = 1000  # characters
-        overlap = 200  # character overlap between chunks
-        
-        chunks = []
-        start = 0
-        
-        while start < len(content):
-            end = start + chunk_size
-            chunk = content[start:end]
-            
-            # Try to break at word boundaries
-            if end < len(content):
-                last_space = chunk.rfind(' ')
-                if last_space > chunk_size * 0.8:  # Only if we find a space in the last 20%
-                    end = start + last_space
-                    chunk = content[start:end]
-            
-            if chunk.strip():  # Only add non-empty chunks
-                chunks.append(chunk.strip())
-            
-            start = end - overlap if end < len(content) else end
-        
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len,
+            separators=["\n\n", "\n", ".", " ", ""],
+        )
+        chunks = splitter.split_text(content)
         logger.info(f"Successfully chunked content into {len(chunks)} pieces")
-        return chunks
-        
+        return [chunk.strip() for chunk in chunks if chunk.strip()]
     except Exception as e:
         logger.error(f"Failed to chunk content: {str(e)}")
         raise

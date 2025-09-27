@@ -22,7 +22,7 @@ def create_azure_model(**kwargs) -> AzureChatOpenAI:
         azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
         api_key=os.getenv("AZURE_OPENAI_API_KEY"),
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
-        temperature=0.5,
+        # temperature=0.5,
         streaming=True,
         **kwargs
     )

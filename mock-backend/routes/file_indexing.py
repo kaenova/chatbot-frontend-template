@@ -8,9 +8,9 @@ from pydantic import BaseModel
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
-from database import db_manager, FileMetadata
+from lib.database import db_manager, FileMetadata
 from orchestration import get_orchestrator
-from auth import verify_credentials
+from lib.auth import verify_credentials
 from datetime import datetime, timedelta
 
 # Configure logging

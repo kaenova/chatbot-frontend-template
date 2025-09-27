@@ -70,7 +70,20 @@ if os.getenv("SEARXNG_URL"):
             query,
             num_results=5,
         )
-        return results
+
+        if not results:
+            return f"No results found for query: '{query}'"
+        
+        print(f"Web search results: {results}")
+        
+        final_results = "Search results:\n"
+        for x in results:
+            final_results += f"""
+# {x["title"]} 
+- URL: {x["link"]}
+- Snippet: {x["snippet"]}\n"""
+
+        return final_results
 
     tool_generator.append(web_search)
 
@@ -109,7 +122,7 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
                 formatted_result = {
                     "score": getattr(result, "@search.score", "N/A"),
                     "title": result.get("title", "No title"),
-                    "content": result.get("content", "No content")[:500] + "..." if len(result.get("content", "")) > 500 else result.get("content", "No content"),
+                    "content": result.get("content", "No content"),
                     "metadata": {k: v for k, v in result.items() if not k.startswith("@") and k not in ["title", "content"]}
                 }
                 formatted_results.append(formatted_result)
@@ -119,12 +132,16 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
             
             # Format results as readable text
             output = f"Found {len(formatted_results)} results for '{query}':\n\n"
-            for i, result in enumerate(formatted_results, 1):
-                output += f"{i}. **{result['title']}** (Score: {result['score']})\n"
-                output += f"   {result['content']}\n"
-                if result['metadata']:
-                    output += f"   Metadata: {result['metadata']}\n"
-                output += "\n"
+            for result in formatted_results:
+                filename = result['metadata'].get('filename', 'Unknown')
+                chunk_index = result['metadata'].get('chunk_index', 0)
+                id_ = result['metadata'].get('id', 'Unknown')
+                content = result['content']
+                output += f"# {filename} {chunk_index}\n"
+                output += f"- chunk_id/id: {id_}\n"
+                output += "Content:\n```\n"
+                output += f"{content}\n"
+                output += "```\n\n"
             
             return output
             
@@ -168,10 +185,9 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
                 
                 formatted_result = {
                     "score": getattr(result, "@search.score", "N/A"),
-                    "reranker_score": getattr(result, "@search.reranker_score", "N/A"),
                     "title": result.get("title", "No title"),
                     "caption": caption_text,
-                    "content": result.get("content", "No content")[:300] + "..." if len(result.get("content", "")) > 300 else result.get("content", "No content"),
+                    "content": result.get("content", "No content"),
                     "metadata": {k: v for k, v in result.items() if not k.startswith("@") and k not in ["title", "content"]}
                 }
                 formatted_results.append(formatted_result)
@@ -181,12 +197,16 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
             
             # Format results as readable text
             output = f"Found {len(formatted_results)} semantic results for '{query}':\n\n"
-            for i, result in enumerate(formatted_results, 1):
-                output += f"{i}. **{result['title']}** (Score: {result['score']}, Reranker: {result['reranker_score']})\n"
-                output += f"   Caption: {result['caption']}\n"
-                if result['metadata']:
-                    output += f"   Metadata: {result['metadata']}\n"
-                output += "\n"
+            for result in formatted_results:
+                filename = result['metadata'].get('filename', 'Unknown')
+                chunk_index = result['metadata'].get('chunk_index', 0)
+                id_ = result['metadata'].get('id', 'Unknown')
+                content = result['content']
+                output += f"# {filename} {chunk_index}\n"
+                output += f"- chunk_id/id: {id_}\n"
+                output += "Content:\n```\n"
+                output += f"{content}\n"
+                output += "```\n\n"
             
             return output
             
@@ -221,7 +241,7 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
                 formatted_result = {
                     "score": getattr(result, "@search.score", "N/A"),
                     "title": result.get("title", "No title"),
-                    "content": result.get("content", "No content")[:400] + "..." if len(result.get("content", "")) > 400 else result.get("content", "No content"),
+                    "content": result.get("content", "No content"),
                     "metadata": {k: v for k, v in result.items() if not k.startswith("@") and k not in ["title", "content"]}
                 }
                 formatted_results.append(formatted_result)
@@ -231,12 +251,16 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
             
             # Format results as readable text
             output = f"Found {len(formatted_results)} filtered results for '{query}' (Filter: {filter_expression}):\n\n"
-            for i, result in enumerate(formatted_results, 1):
-                output += f"{i}. **{result['title']}** (Score: {result['score']})\n"
-                output += f"   {result['content']}\n"
-                if result['metadata']:
-                    output += f"   Metadata: {result['metadata']}\n"
-                output += "\n"
+            for result in formatted_results:
+                filename = result['metadata'].get('filename', 'Unknown')
+                chunk_index = result['metadata'].get('chunk_index', 0)
+                id_ = result['metadata'].get('id', 'Unknown')
+                content = result['content']
+                output += f"# {filename} {chunk_index}\n"
+                output += f"- chunk_id/id: {id_}\n"
+                output += "Content:\n```\n"
+                output += f"{content}\n"
+                output += "```\n\n"
             
             return output
             
@@ -295,9 +319,8 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
                     formatted_results = []
                     for result in results:
                         formatted_result = {
-                            "score": getattr(result, "@search.score", "N/A"),
                             "title": result.get("title", "No title"),
-                            "content": result.get("content", "No content")[:400] + "..." if len(result.get("content", "")) > 400 else result.get("content", "No content"),
+                            "content": result.get("content", "No content"),
                             "metadata": {k: v for k, v in result.items() if not k.startswith("@") and k not in ["title", "content", vector_field]}
                         }
                         formatted_results.append(formatted_result)
@@ -307,12 +330,16 @@ if (os.getenv("AZURE_SEARCH_ENDPOINT") and
                     
                     # Format results as readable text
                     output = f"Found {len(formatted_results)} vector similarity results for '{query}':\n\n"
-                    for i, result in enumerate(formatted_results, 1):
-                        output += f"{i}. **{result['title']}** (Similarity: {result['score']})\n"
-                        output += f"   {result['content']}\n"
-                        if result['metadata']:
-                            output += f"   Metadata: {result['metadata']}\n"
-                        output += "\n"
+                    for result in formatted_results:
+                        filename = result['metadata'].get('filename', 'Unknown')
+                        chunk_index = result['metadata'].get('chunk_index', 0)
+                        id_ = result['metadata'].get('id', 'Unknown')
+                        content = result['content']
+                        output += f"# {filename} {chunk_index}\n"
+                        output += f"- chunk_id/id: {id_}\n"
+                        output += "Content:\n```\n"
+                        output += f"{content}\n"
+                        output += "```\n\n"
                     
                     return output
                     

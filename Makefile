@@ -49,7 +49,7 @@ dev:
 dev-graph-backend:
 	@echo "🤖 Starting LangGraph FastAPI server..."
 	@echo "This is not reloadable. Restart this command to apply changes."
-	cd mock-langgraph-server && uv run uvicorn main:app --host 0.0.0.0 --port 8000
+	cd mock-backend && uv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 # Build frontend for production
 build-frontend:
@@ -135,14 +135,14 @@ db-restore:
 
 langgraph-setup:
 	@echo "⚙️  Setting up LangGraph server..."
-	@if [ ! -f mock-langgraph-server/.env ]; then \
+	@if [ ! -f mock-backend/.env ]; then \
 		echo "Creating .env from env.sample..."; \
-		cp mock-langgraph-server/env.sample mock-langgraph-server/.env; \
-		echo "⚠️  Please edit mock-langgraph-server/.env with your Azure OpenAI credentials"; \
+		cp mock-backend/env.sample mock-backend/.env; \
+		echo "⚠️  Please edit mock-backend/.env with your Azure OpenAI credentials"; \
 	fi
 	@echo "✅ LangGraph setup complete!"
 
 langgraph-install:
 	@echo "📥 Installing LangGraph dependencies..."
-	cd mock-langgraph-server && uv sync
+	cd mock-backend && uv sync
 	@echo "✅ LangGraph dependencies installed"

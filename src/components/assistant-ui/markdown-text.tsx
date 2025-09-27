@@ -48,10 +48,8 @@ function processCustomPatterns(input: string): string {
 }
 
 function combinePreprocessors(input: string): string {
-  return normalizeCustomMathTags(processCustomPatterns(input));
+  return processCustomPatterns(normalizeCustomMathTags(input));
 }
-
-
 
 const MarkdownTextImpl = () => {
   return (

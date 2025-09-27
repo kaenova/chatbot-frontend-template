@@ -28,7 +28,7 @@ A real-time Azure inference API built with FastAPI, LangGraph, and Azure OpenAI.
 
 1. Navigate to the project directory:
 ```bash
-cd mock-langgraph-server
+cd mock-backend
 ```
 
 2. Install dependencies using UV:
@@ -116,7 +116,7 @@ All endpoints require HTTP Basic Authentication.
 ## Project Structure
 
 ```
-mock-langgraph-server/
+mock-backend/
 ├── main.py                       # FastAPI server and routes
 ├── database.py                   # Database models and operations
 ├── auth.py                       # HTTP Basic Authentication
