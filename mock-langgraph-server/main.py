@@ -1,4 +1,7 @@
 """Main FastAPI server with LangGraph integration."""
+import sys
+sys.dont_write_bytecode = True
+
 # Load environment variables
 from dotenv import load_dotenv
 load_dotenv()

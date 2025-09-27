@@ -1,10 +1,12 @@
 import json
 import uuid
-from langchain_core.messages import AIMessageChunk, AIMessage, ToolMessage
+from langchain_core.messages import AIMessageChunk, AIMessage, ToolMessage, HumanMessage
 
 from langgraph.graph.state import CompiledStateGraph
 
-async def generate_stream(graph: CompiledStateGraph, input_message: str, conversation_id: str):
+from typing import List
+
+async def generate_stream(graph: CompiledStateGraph, input_message: List[HumanMessage], conversation_id: str):
     # Generate unique message ID
     message_id = str(uuid.uuid4())
     
