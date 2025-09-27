@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { FileIndexingAPI } from '@/lib/file-indexing'
-import { isValidFileType, getMaxFileSize, formatFileSize } from '@/lib/file-utils'
+import { FileIndexingAPI } from '@/lib/integration/client/file-indexing'
+import { isValidFileType, getMaxFileSize, formatFileSize } from '@/utils/file-utils'
 
 interface FileUploadProps {
   onUploadSuccess: () => void

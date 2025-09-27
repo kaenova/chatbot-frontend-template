@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileMetadata, FileIndexingAPI } from '@/lib/file-indexing'
+import { FileMetadata, FileIndexingAPI } from '@/lib/integration/client/file-indexing'
 import FileUpload from '@/components/FileUpload'
 import FileList from '@/components/FileList'
 import FileStats from '@/components/FileStats'

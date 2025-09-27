@@ -3,20 +3,17 @@
 import React, { useState } from 'react'
 import { Thread } from "@/components/assistant-ui/thread";
 import { AssistantRuntimeProvider, ThreadHistoryAdapter } from '@assistant-ui/react';
-import { useParams, useRouter } from 'next/navigation';
-import { useDataStreamRuntime } from '@assistant-ui/react-data-stream';
-import { extractConversationFromHistory } from '@/lib/langgraph-message-conversion';
+import { useParams } from 'next/navigation';
+import { ChatWithConversationIDAPIRuntime, LoadConversationHistory } from '@/lib/integration/client/chat-conversation';
 
 function ChatPage() {
   const params = useParams()
   const conversationId = params.conversationId as string
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   const HistoryAdapter: ThreadHistoryAdapter = {
 
-    // @ts-expect-error // conversationId might be undefined during initial render
     async load() {
       try {
         if (!conversationId) {
@@ -26,28 +23,22 @@ function ChatPage() {
         setIsLoadingHistory(true)
         setError(null)
 
-        const fetchURL = `/api/be/conversations/${conversationId}`
+        const historyData = await LoadConversationHistory(conversationId);
 
-        // Load messages from your existing conversation API
-        const response = await fetch(fetchURL);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            // Conversation not found, set error and return empty messages
-            router.push('/not-found')
-            setError('Conversation not found')
-            return { messages: [] };
-          }
+        if (historyData === null) {
+          setError('Failed to load conversation history')
           setIsLoadingHistory(false)
-          throw new Error(`HTTP error! status: ${response.status}`);
+          return { messages: [] };
         }
 
-        const resMsg = await response.json();
-
-        const messagesData = extractConversationFromHistory(resMsg);
+        if (historyData.length === 0) {
+          setError('Conversation not found')
+          setIsLoadingHistory(false)
+          return { messages: [] };
+        }
 
         setIsLoadingHistory(false)
-        return { messages: messagesData };
+        return { messages: historyData };
       } catch (error) {
         console.error('Failed to load conversation history:', error);
         setError('Failed to load conversation history')
@@ -62,12 +53,7 @@ function ChatPage() {
     },
   }
 
-   const runtime = useDataStreamRuntime({
-    api: '/api/be/conversations/' + conversationId + '/chat',
-    adapters: {
-      history: HistoryAdapter,
-    }
-  });
+   const runtime = ChatWithConversationIDAPIRuntime(conversationId, HistoryAdapter)
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>

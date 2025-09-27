@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { FileMetadata, FileIndexingAPI } from '@/lib/file-indexing'
+import { FileMetadata, FileIndexingAPI, getStatusText, getStatusColor } from '@/lib/integration/client/file-indexing'
 import { 
   formatUploadTime, 
   getFileIcon, 
-  getStatusColor, 
-  getStatusText 
-} from '@/lib/file-utils'
+} from '@/utils/file-utils'
 import GenericConfirmationModal from './GenericConfirmationModal'
 
 interface FileListProps {

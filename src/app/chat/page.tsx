@@ -3,8 +3,8 @@
 import React, {useState, useEffect} from 'react'
 import { Thread } from "@/components/assistant-ui/thread";
 import { AssistantRuntimeProvider, useAssistantState } from '@assistant-ui/react';
-import { useDataStreamRuntime } from "@assistant-ui/react-data-stream";
 import { useRouter } from 'next/navigation';
+import { FirstChatAPIRuntime, GetLastConversationId } from '@/lib/integration/client/chat-conversation';
 
 function RedirectWhenDone() {
   const router = useRouter()
@@ -14,14 +14,11 @@ function RedirectWhenDone() {
 
   async function getLastConversationIdAndRedirect() {
     // Fetch the last conversation and get its ID
-    const response = await fetch('/api/be/last-conversation-id')
-
-    if (response.ok) {
-      const data = await response.json();
-      const conversationId = data.lastConversationId;
-      router.push('/chat/' + conversationId);
+    const conversationID = await GetLastConversationId()
+    if (conversationID) {
+      router.push('/chat/' + conversationID);
     } else {
-      console.error('Failed to fetch last conversation ID');
+      console.error('No conversation ID found, cannot redirect.');
     }
   }
 
@@ -42,9 +39,7 @@ function RedirectWhenDone() {
 
 function ChatPage() {
 
-  const runtime = useDataStreamRuntime({
-    api: '/api/be/chat',
-  });
+  const runtime = FirstChatAPIRuntime()
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>

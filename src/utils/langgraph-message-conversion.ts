@@ -530,7 +530,7 @@ export function convertLanggraphStateToAssistantUI(
 }
 
 // Utility function to extract conversation history from multiple checkpoints
-export function extractConversationFromHistory(
+export function loadFromLanggraphStateHistoryJSON(
   stateHistory: LanggraphStateHistory
 ): Array<{ message: ThreadMessage; parentId: string | null }> {
   if (!Array.isArray(stateHistory) || stateHistory.length === 0) {

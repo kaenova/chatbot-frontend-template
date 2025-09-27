@@ -1,8 +1,8 @@
+import { getAuthSession } from "@/auth"
 import { redirect } from "next/navigation"
-import { getSessionOrMock } from "@/lib/mock-session"
 
 export default async function Home() {
-  const session = await getSessionOrMock()
+  const session = await getAuthSession()
   
   if (session?.user) {
     redirect('/chat')

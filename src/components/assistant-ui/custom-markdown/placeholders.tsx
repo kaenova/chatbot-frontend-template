@@ -4,6 +4,7 @@ import { Download, ExternalLinkIcon, FileTextIcon } from "lucide-react";
 import { type FC, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ChunkData, getChunkData } from "@/lib/integration/client/chunk";
 
 // Props for the doc placeholder component
 interface DocPlaceholderProps {
@@ -16,16 +17,6 @@ interface DocPlaceholderProps {
 interface LinkPlaceholderProps {
   url: string;
   className?: string;
-}
-
-// Placeholder component for [doc-(id)] patterns
-interface ChunkData {
-  content: string;
-  metadata: {
-    filename: string,
-    chunk_index: number
-  };
-  file_url: string;
 }
 
 export const DocPlaceholder: FC<DocPlaceholderProps> = ({
@@ -41,10 +32,8 @@ export const DocPlaceholder: FC<DocPlaceholderProps> = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/be/api/v1/chunk/${id}`);
-        if (!res.ok) throw new Error('Failed to fetch');
-        const json = await res.json();
-        setData(json);
+        const data = await getChunkData(id);
+        setData(data);
       } catch (err) {
         console.error('Error fetching chunk data:', err);
         setError('Failed to load document info');
@@ -87,8 +76,8 @@ export const DocPlaceholder: FC<DocPlaceholderProps> = ({
         onClick={handleClick}
         disabled={loading}
         className={cn(
-          "aui-doc-placeholder inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-sm font-medium text-primary hover:bg-primary/20 transition-colors border border-primary/20 hover:border-primary/30 mx-2",
-          loading && "opacity-50 cursor-not-allowed",
+          "aui-link-placeholder inline-flex items-center gap-1 rounded-md bg-primary/5 px-2 py-1 text-sm font-medium text-primary/80 hover:bg-primary/10 hover:text-primary transition-colors border border-primary/15 hover:border-primary/25 mx-2", 
+          loading && 'cursor-not-allowed opacity-60',
           className
         )}
         title={`Open document: ${id}`}
@@ -118,7 +107,7 @@ export const DocPlaceholder: FC<DocPlaceholderProps> = ({
                   <div className="mt-4 flex justify-end">
                     <button
                       onClick={handleDownload}
-                      className="inline-flex items-center gap-2 rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 transition-colors border border-primary/20 hover:border-primary/30"
+                      className="inline-flex items-center gap-2 rounded-md bg-primary/5 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors border border-primary/20 hover:border-primary/30"
                     >
                       <Download className="h-4 w-4" />
                       Download Full File

@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 import { getSiteConfig } from "@/lib/site-config";
-import { getTimeOfDay } from "@/lib/time-utils";
+import { getTimeOfDay } from "@/utils/time-utils";
 import { ChatMessageSkeleton } from "@/components/ChatMessageSkeleton";
 
 interface ThreadProps {

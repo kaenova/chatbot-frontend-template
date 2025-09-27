@@ -1,6 +1,6 @@
 'use client'
 
-import { FileMetadata } from '@/lib/file-indexing'
+import { FileMetadata } from '@/lib/integration/client/file-indexing'
 
 interface FileStatsProps {
   files: FileMetadata[]

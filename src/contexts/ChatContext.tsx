@@ -1,8 +1,9 @@
 'use client'
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
-import { formatRelativeTime } from '@/lib/date-utils'
+import { formatRelativeTime } from '@/utils/date-utils'
 import { useSession } from 'next-auth/react'
+import { DeleteConversation, GetConversationsList, TogglePinConversation } from '@/lib/integration/client/chat-conversation'
 
 interface ChatItem {
   id: string
@@ -12,12 +13,6 @@ interface ChatItem {
   isPinned: boolean
 }
 
-interface ConversationApiResponse {
-  id: string
-  title: string
-  created_at: number
-  is_pinned: boolean
-}
 
 interface ChatContextType {
   chatHistory: ChatItem[]
@@ -242,19 +237,14 @@ export function ChatProvider({ children }: ChatProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await fetch('/api/be/conversations')
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+
+      const data = await GetConversationsList()
+      if (data === null) {
+        setError('Failed to load conversations')
+        return
       }
-      const data = await response.json() as ConversationApiResponse[]
-      const conversations = data.map((conv) => ({
-        id: conv.id,
-        title: conv.title,
-        date: formatRelativeTime(conv.created_at * 1000),
-        createdAt: conv.created_at * 1000,
-        isPinned: conv.is_pinned
-      }))
-      setChatHistory([...conversations])
+
+      setChatHistory([...data])
     } catch (err) {
       setError('Failed to load conversations')
       console.error('Load conversations error:', err)
@@ -267,14 +257,9 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const togglePinChat = async (chatId: string) => {
     try {
       setError(null)
-      const response = await fetch(`/api/be/conversations/${chatId}/pin`, {
-        method: 'POST',
-        body: JSON.stringify({
-          is_pinned: !chatHistory.find(chat => chat.id === chatId)?.isPinned
-        }),
-      })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      const response = await TogglePinConversation(chatId)
+      if (!response) {
+        throw new Error('Failed to toggle pin status')
       }
       // Update local state optimistically
       setChatHistory(prevHistory =>
@@ -293,11 +278,9 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const deleteChat = async (chatId: string) => {
     try {
       setError(null)
-      const response = await fetch(`/api/be/conversations/${chatId}`, {
-        method: 'DELETE',
-      })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      const response = await DeleteConversation(chatId)
+      if (!response) {
+        throw new Error('Failed to delete conversation')
       }
       // Update local state optimistically
       setChatHistory(prevHistory =>

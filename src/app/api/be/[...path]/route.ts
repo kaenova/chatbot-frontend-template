@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/auth'
-import { getBackendUrl, getBackendAuthHeaders } from '@/lib/backend-auth'
+import { getBackendUrl, getBackendAuthHeaders } from '@/lib/integration/server'
 // import { DataStreamResponse } from "assistant-stream";
 
 export async function GET(
@@ -54,7 +54,7 @@ async function handleProxyRequest(
     
     // Construct the backend path
     const backendPath = '/' + params.path.join('/')
-    const backendUrl = getBackendUrl()
+    const backendUrl = await getBackendUrl()
     const fullBackendUrl = `${backendUrl}${backendPath}`
     
     // Copy search parameters from the original request
@@ -65,7 +65,7 @@ async function handleProxyRequest(
       : fullBackendUrl
 
     // Prepare headers - start with backend auth headers
-    const headers = getBackendAuthHeaders()
+    const headers = await getBackendAuthHeaders()
 
     // Add UserID header if user is authenticated
     if (session?.user?.id) {

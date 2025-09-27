@@ -1,3 +1,4 @@
+'use server'
 /**
  * Backend API Authentication Utilities
  * 
@@ -10,7 +11,7 @@
  * @returns Authorization header string with Basic auth credentials
  * @throws Error if backend credentials are not configured
  */
-export function getBackendAuthHeader(): string {
+export async function getBackendAuthHeader(): Promise<string> {
   const username = process.env.BACKEND_API_USERNAME
   const password = process.env.BACKEND_API_PASSWORD
 
@@ -29,9 +30,9 @@ export function getBackendAuthHeader(): string {
  * @param additionalHeaders Additional headers to include
  * @returns Headers object with Authorization header and any additional headers
  */
-export function getBackendAuthHeaders(additionalHeaders: Record<string, string> = {}): Record<string, string> {
+export async function getBackendAuthHeaders(additionalHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
   return {
-    'Authorization': getBackendAuthHeader(),
+    'Authorization': await getBackendAuthHeader(),
     ...additionalHeaders
   }
 }
@@ -40,6 +41,6 @@ export function getBackendAuthHeaders(additionalHeaders: Record<string, string> 
  * Get the backend URL from environment variables
  * @returns Backend URL string
  */
-export function getBackendUrl(): string {
+export async function getBackendUrl(): Promise<string> {
   return process.env.BACKEND_URL || 'http://localhost:8000'
 }

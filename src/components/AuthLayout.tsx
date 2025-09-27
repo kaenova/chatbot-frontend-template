@@ -1,14 +1,14 @@
 import { ReactNode } from 'react'
-import { getSessionOrMock } from '@/lib/mock-session'
 import { redirect } from 'next/navigation'
 import GlobalNavbar from './GlobalNavbar'
+import { getAuthSession } from '@/auth'
 
 interface AuthLayoutProps {
   children: ReactNode
 }
 
 export default async function AuthLayout({ children }: AuthLayoutProps) {
-  const session = await getSessionOrMock()
+  const session = await getAuthSession()
 
   if (!session?.user) {
     redirect('/auth/signin')
